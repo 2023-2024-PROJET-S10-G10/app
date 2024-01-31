@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cigri"
+version = "4.0.0"
+description = "CiGri in Python"
+authors = ["Diego CORREIA DE OLIVEIRA <Diego.cdo27@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.12"
+SQLAlchemy = "2.0"
+fastapi = "^0.109.0"
+rich-click = "^1.7.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
