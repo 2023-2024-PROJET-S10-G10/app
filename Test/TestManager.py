@@ -51,7 +51,7 @@ class TestManager:
                              "tests": tests}
 
             self.stats.append(subclassStats)
-        self.summary()
+        return self.summary()
 
     def testClass(self, classToTest):
         testsStats = []
@@ -113,7 +113,10 @@ class TestManager:
                 self.debug(debugLevel, '\t' + color + test["test_name"], test["details"] + '\033[0m')
 
         if totalTests == 0:
-            sys.exit("No tests found")
+            self.debug(0, "No test found")
+            exit(1)
         self.debug(0, "\n" + ("Success" if passedMethods == totalMethods else "Failed"))
         self.debug(0, f"Total Passed Tests: {passedTests}/{totalTests} {100 * passedTests / totalTests:.1f}%")
         self.debug(0, f"Total Passed Methods: {passedMethods}/{totalMethods} {100 * passedMethods / totalMethods:.1f}%")
+
+        return passedMethods == totalMethods
