@@ -1,12 +1,13 @@
 import os
 import sys
 from TestManager import TestManager
+sys.path.append(sys.path[0].replace('Test', ''))
 
 if __name__ == '__main__':
     files = [file for file in os.listdir(os.getcwd()) if
              file.endswith(".py") and file != "TestManager.py" and file != "Test.py"]
     if len(files) == 0:
-        print("No tests found")
+        print("No tests found (Did you run the command in app/Test/ directory ?)")
         exit(1)
     for file in files:
         module_name = file.replace(".py", "")
