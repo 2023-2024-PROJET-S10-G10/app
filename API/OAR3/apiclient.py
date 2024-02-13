@@ -1,6 +1,9 @@
 import http.client
 import io
+import json
 import ssl
+import string
+from typing import Iterable
 
 
 class ApiClient:
@@ -17,14 +20,23 @@ class ApiClient:
         self.client.port = port
 
     def send_request(self, method, url, headers={}, body={}):
-        self.client.request(method, self.baseEndpoint + url, headers=headers | self._headers, body=body)
-        return self.client.getresponse()
+        self.client.request(method, self.baseEndpoint + url, headers=headers | self._headers, body=json.dumps(body))
+        res = self.client.getresponse()
+        content = res.read()
+        self.client.close()
+        return res, content
 
     @staticmethod
-    def queries(queries):
+    def queries(**queries):
+        if len(queries) == 0:
+            return ""
         query_string = "?"
         for elt in queries:
-            query_string += str(elt) + "=" + str(queries[elt]) + '&'
+            if type(queries[elt]) is list:
+                for value in queries[elt]:
+                    query_string += str(elt) + "=" + str(value) + '&'
+            else:
+                query_string += str(elt) + "=" + str(queries[elt]) + '&'
         return query_string[0:-1]
 
     def get(self, url, headers={}, body={}):
