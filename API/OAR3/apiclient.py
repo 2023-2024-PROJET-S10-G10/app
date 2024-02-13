@@ -1,19 +1,23 @@
 import http.client
 import io
+import ssl
 
 
 class ApiClient:
     _instance = None
+    _headers = {}
 
-    def __init__(self, host=None, port=None):
-        self.client = http.client.HTTPConnection(host, port)
+    def __init__(self, host="", port="", baseEndpoint="", headers={}):
+        self.client = http.client.HTTPSConnection(host, port, context=ssl._create_unverified_context())
+        self._headers = self._headers | headers
+        self.baseEndpoint = baseEndpoint
 
     def set_host(self, host, port):
         self.client.host = host
         self.client.port = port
 
-    def send_request(self, method, url, headers=None, body=None):
-        self.client.request(method, url, headers=headers, body=body)
+    def send_request(self, method, url, headers={}, body={}):
+        self.client.request(method, self.baseEndpoint + url, headers=headers | self._headers, body=body)
         return self.client.getresponse()
 
     @staticmethod
@@ -23,7 +27,7 @@ class ApiClient:
             query_string += str(elt) + "=" + str(queries[elt]) + '&'
         return query_string[0:-1]
 
-    def get(self, url, headers=None, body=None):
+    def get(self, url, headers={}, body={}):
         """
         Do a GET request
         :param url: request url
@@ -32,7 +36,7 @@ class ApiClient:
         """
         return self.send_request("GET", url, headers, body)
 
-    def delete(self, url, headers=None, body=None):
+    def delete(self, url, headers={}, body={}):
         """
         Do a DELETE request
         :param url: request url
@@ -41,7 +45,7 @@ class ApiClient:
         """
         return self.send_request("DELETE", url, headers, body)
 
-    def post(self, url, headers=None, body=None):
+    def post(self, url, headers={}, body={}):
         """
         Do a POST request
         :param url: request url
@@ -62,7 +66,7 @@ class ApiClientStub(ApiClient):
         self.status = status
         self.headers = headers
 
-    def send_request(self, method, url="localhost", headers={}, body=None):
+    def send_request(self, method, url="localhost", headers={}, body={}):
         conn = http.client.HTTPConnection("localhost")
 
         simulated_response = http.client.HTTPResponse(ApiClientStub.SocketStub(self.response_content))
