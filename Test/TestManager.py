@@ -30,15 +30,18 @@ class TestManager:
 
     @staticmethod
     def assertFalse(boolean):
-        TestManager.assertTrue(not boolean)
+        if boolean:
+            raise AssertionError("Assert Failed")
 
     @staticmethod
-    def assertEqual(val1, val2):
-        TestManager.assertTrue(val1 == val2)
+    def assertEqual(value, expected):
+        if value != expected:
+            raise AssertionError("Assert Failed : Expected : {}, got : {}".format(expected, value))
 
     @staticmethod
-    def assertNotEqual(val1, val2):
-        TestManager.assertFalse(val1 == val2)
+    def assertNotEqual(value, expected):
+        if value == expected:
+            raise AssertionError("Assert Failed : Not Expected : {}, got : {}".format(expected, value))
 
     # Run all referenced tests
     def start(self):
@@ -75,11 +78,11 @@ class TestManager:
             test(self)
             return True, "Success"
         except AssertionError:
-            return False, "Failed " + '\"' + \
-                          ' '.join([a.strip() for a in traceback.format_exc().split('\n')[3:5]]).split('Test/')[-1]
-        except:
-            return False, "Exception raised " + '\"' + \
-                          ' '.join([a.strip() for a in traceback.format_exc().split('\n')[3:5]]).split('Test/')[-1]
+            return False, "Failed \"" + \
+                          '\n'.join(['\t' + a for a in traceback.format_exc().split('\n')])
+        except Exception:
+            return False, "Exception raised \"" + \
+                          '\n'.join(['\t' + a for a in traceback.format_exc().split('\n')]).split('Test/')[-1]
 
     def summary(self):
         with open("Logs/" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S").split('.')[0] + ".json", "w") as log:
