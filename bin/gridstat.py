@@ -1,5 +1,30 @@
 import rich_click as click
 
+click.rich_click.OPTION_GROUPS = {
+    "gridstat.py": [
+        {
+            "name": "Targeting options",
+            "options": ["--campaign", "--job", "--username", "--offset"]
+        },
+        {
+            "name": "Output options",
+            "options": ["--full", "--events"]
+        },
+        {
+            "name": "Advanced output options",
+            "options": ["--dump", "--pretty", "--headerless", "--cinfos"]
+        },
+        {
+            "name": "File options",
+            "options": ["--stdout", "--stderr", "--jdl"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"]
+        },
+    ]
+}
+
 
 class ID(int):
     name = "ID"

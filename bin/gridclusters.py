@@ -1,5 +1,22 @@
 import rich_click as click
 
+click.rich_click.OPTION_GROUPS = {
+    "gridclusters.py": [
+        {
+            "name": "Basic option",
+            "options": ["--infos", "--more_infos"],
+        },
+        {
+            "name": "Visualization customization option",
+            "options": ["--usage", "--bars"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"],
+        },
+    ]
+}
+
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(

@@ -1,5 +1,26 @@
 import rich_click as click
 
+click.rich_click.OPTION_GROUPS = {
+    "gridsub.py": [
+        {
+            "name": "Basic options",
+            "options": ["--campaign", "--details"],
+        },
+        {
+            "name": "JDL options",
+            "options": ["--file", "--jobfile"]
+        },
+        {
+            "name": "JSON options",
+            "options": ["--json", "--jsonjob"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"],
+        },
+    ]
+}
+
 
 class ID(int):
     name = "ID"
