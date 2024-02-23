@@ -1,0 +1,58 @@
+{
+    "name": "test_job",
+    "params": [
+        "test-prefect true",
+        "titi true",
+        "tata false",
+        "toto false",
+        "tata true",
+        "titi false",
+        "toto true"
+    ],
+    "clusters": {
+        "luke": {
+            "type": "normal",
+            "project": "prefect_or_not",
+            "prologue": [
+                "pwd",
+                "mkdir toto",
+                "cd toto",
+                "pwd",
+                "cd ..",
+                "ls -al",
+                "rm -r toto",
+                "ls -al"
+            ],
+            "walltime": "00:20:00",
+            "exec_file": "test_job.py",
+            "resources": "core=1",
+            "test_mode": "false",
+            "properties": "",
+            "exec_directory": "{HOME}/Downloads/test_prefect/test/test_file/",
+            "temporal_grouping": "false",
+            "checkpointing_type": "None",
+            "dimensional_grouping": "false",
+            "output_gathering_method": "None"
+        },
+        "dahu": {
+            "type": "best-effort",
+            "project": "prefect",
+            "epilogue": [
+                "pwd",
+                "cd ..",
+                "ls -al"
+            ],
+            "walltime": "01:00:00",
+            "exec_file": "test_job.py",
+            "resources": "core=1",
+            "test_mode": "false",
+            "properties": "",
+            "exec_directory": "{HOME}/Downloads/test_prefect/test/test_file/",
+            "temporal_grouping": "false",
+            "checkpointing_type": "None",
+            "dimensional_grouping": "false",
+            "output_gathering_method": "None"
+        }
+    },
+    "jobs_type": "normal"
+}

@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from typing import Optional, List
 from datetime import datetime
 
-engine = create_engine("sqlite+pysqlite:///mydb", echo=True)
+engine = create_engine("sqlite+pysqlite:///SQL/mycigri.db", echo=True)
 
 metadata_obj = MetaData()
 
@@ -30,6 +30,7 @@ class campaign_state2(enum.Enum):
     in_treatment = "in_treatment"
     paused = "paused"
     terminated = "terminated"
+
 class job_state(enum.Enum):
     to_launch = 1
     launching = 2
@@ -102,12 +103,12 @@ campagnes = Table(
     Column("id", Integer, primary_key=True),
     Column("grid_user", String(255), nullable=False),
     Column("state", Enum(campaign_state), nullable=False),
-    Column("type", String(255), nullable=false),
+    Column("type", String(255), nullable=False),
     Column("name", String(255)),
     Column("submission_time", TIMESTAMP),   # manque p'tet la spécification time zone, pour tout les TIMESTAMP d'ailleurs, faire une manip au ctrl h
     Column("completion_time", TIMESTAMP),
     Column("nb_jobs", Integer),
-    Column("jdl", Text),
+    Column("jdl", Text)
 )
 
 campaign_properties = Table(
@@ -123,10 +124,10 @@ campaign_properties = Table(
 parameters = Table(
     "parameters",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True),    # devrait être un bigserial
+    Column("id", Integer, primary_key=True, autoincrement=True),    # devrait être un bigserial
     Column("campaign_id", Integer, nullable=False),
     Column("name", String(255)),
-    Column("param", Text)
+    Column("param", Text),
     # manque une contrainte d'unicité sur le couple name et campagne_id
 )
 
@@ -154,7 +155,7 @@ jobs_to_launch = Table(
 jobs = Table(
     "jobs",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True),
+    Column("id", Integer, primary_key=True),
     Column("campaign_id", Integer, nullable=False),
     Column("param_id", Integer, nullable=False),
     Column("batch_id", Integer),
@@ -184,7 +185,7 @@ events = Table(
     Column("campaign_id", Integer),
     Column("parent", Integer),
     Column("checked", Enum(checkbox)),
-    Column("notified", Boolean, nullable=False, default=False_),
+    Column("notified", Boolean, nullable=False, default=False),
     Column("date_open", TIMESTAMP),
     Column("date_closed", TIMESTAMP),
     Column("date_update", TIMESTAMP),
@@ -283,12 +284,25 @@ class Cluster(Base):
   stress_factor: Mapped[float] = mapped_column(Float, nullable=True)
   enabled: Mapped[bool] = mapped_column(Boolean)
 
-metadata_obj.create_all(engine)
 
+if __name__ == "__main__":
+    metadata_obj.create_all(engine)
 
-stmt = insert(campagnes).values(grid_user="clément", state=campaign_state(2), submission_time=datetime.now())
+    #TODO: Replace dummy values
+    clusterLuke = insert(cluster_table).values(name="luke", api_url="/foo", api_username="dova", api_password="zer", batch=api(1), api_auth_type=auth_type(1))
+    clusterDahu = insert(cluster_table).values(name="dahu", api_url="/bar", api_username="air", api_password="zerzer", batch=api(2), api_auth_type=auth_type(1))
+   
+    with engine.connect() as conn:
+        conn.execute(clusterLuke)
+        conn.commit()
+        conn.execute(clusterDahu)
+        conn.commit()
 
-with engine.connect() as conn:
-    result = conn.execute(stmt)
-    #conn.execute(insert(cluster_table).values(name="Luke", api_url="/prout", api_username="dova", api_password="zer", batch=api(1), api_auth_type="pouet"))
-    conn.commit()
+    """
+    stmt = insert(campagnes).values(grid_user="clément", state=campaign_state(2), submission_time=datetime.now(), type="test")
+
+    with engine.connect() as conn:
+        result = conn.execute(stmt)
+        #conn.execute(insert(cluster_table).values(name="Luke", api_url="/prout", api_username="dova", api_password="zer", batch=api(1), api_auth_type="pouet"))
+        conn.commit()
+    """
