@@ -1,5 +1,22 @@
 import rich_click as click
 
+click.rich_click.OPTION_GROUPS = {
+    "griddel.py": [
+        {
+            "name": "Basic options",
+            "options": ["--campaign_ids", "--job"],
+        },
+        {
+            "name": "State management options",
+            "options": ["--pause", "--resume", "--purge"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"],
+        },
+    ]
+}
+
 
 class IntListParamType(click.ParamType):
     name = "id1,id2,idN"

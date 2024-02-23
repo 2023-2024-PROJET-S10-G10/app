@@ -1,6 +1,19 @@
 import rich_click as click
 import re
 
+click.rich_click.OPTION_GROUPS = {
+    "gridnotify.py": [
+        {
+            "name": "Basic options",
+            "options": ["--list", "--mail", "--severity", "--unsubscribe"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"]
+        },
+    ]
+}
+
 
 class EmailParamType(click.ParamType):
     name = 'address'

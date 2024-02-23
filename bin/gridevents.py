@@ -1,5 +1,22 @@
 import rich_click as click
 
+click.rich_click.OPTION_GROUPS = {
+    "gridevents.py": [
+        {
+            "name": "Basic options",
+            "options": ["--campaign", "--all", "--global", "--event"],
+        },
+        {
+            "name": "Fix option",
+            "options": ["--fix", "--resubmit"]
+        },
+        {
+            "name": "Advanced options",
+            "options": ["--verbose", "--version", "--help"],
+        },
+    ]
+}
+
 
 class ID(int):
     name = "ID"
