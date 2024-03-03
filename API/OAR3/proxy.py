@@ -7,9 +7,8 @@ class ProxyAPI:
         else:
             self.client = client
 
-    def proxy(self, urlCible, travail):
+    def proxy(self, jobId):
         """
         Redirige vers l'URL cible définie pour le travail spécifié en utilisant Traefik comme proxy.
         """
-
-        pass
+        self.client.get("/proxy/" + jobId)
