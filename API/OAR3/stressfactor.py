@@ -11,4 +11,4 @@ class StressFactorAPI:
         """
         :return: Le facteur de stress en utilisant un script spécifié dans le fichier de configuration. Il est retourné en tant que paire clé-valeur dans un dictionnaire.
         """
-        pass
+        self.client.get("/stress_factor")
