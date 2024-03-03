@@ -7,17 +7,20 @@ class ResourceAPI:
         else:
             self.client = client
 
-    def resources(self):
+    def resources(self, offset=None, limit=None, detailed=None, network_address=None):
         """
         :return: une liste paginée de ressources avec des détails facultatifs, tels que l'adresse réseau.
         """
-        pass
+        args = locals().copy()
+        args.pop("self")
+        args = {k: v for k, v in args.items() if v is not None}
+        return self.client.get("/resources" + ApiClient.queries(**args))
 
     def busyResources(self):
         """
         :return: un dictionnaire indiquant le nombre de ressources occupées.
         """
-        pass
+        return self.client.get("/resources/busy")
 
     def resource(self, resourceId):
         """
@@ -25,26 +28,30 @@ class ResourceAPI:
         """
         pass
 
-    def jobs(self, resourceId):
+    def jobs(self, resourceId, limit=None, offset=None):
         """
         :return: une liste paginée des emplois associés à une ressource donnée.
         """
-        pass
+        args = locals().copy()
+        args.pop("self")
+        args.pop("resourceId")
+        args = {k: v for k, v in args.items() if v is not None}
+        return self.client.get("/resources/" + str(resourceId) + "/jobs" + ApiClient.queries(**args))
 
-    def state(self, resourceId):
+    def state(self, resourceId, body={}):
         """
         Change l'état d'une ressource et envoie des notifications.
         """
-        pass
+        return self.client.post("/resources/" + str(resourceId) + "/state", body=body)
 
-    def createResource(self, name, properties):
+    def createResource(self, hostname, properties):
         """
         Crée une nouvelle ressource avec un nom d'hôte et des propriétés spécifiés.
         """
-        pass
+        return self.client.post("/resources" + ApiClient.queries(hostname=hostname, properties=properties))
 
     def deleteResource(self, resourceId):
         """
         Supprime la ressource spécifiée avec l'identifiant correspondant.
         """
-        pass
+        return self.client.delete("/resources/" + str(resourceId))
