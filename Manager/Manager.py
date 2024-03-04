@@ -1,11 +1,13 @@
 class Manager:
     _instance = None
-    listeners = {}  # Dictionnary of string to list of function
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Manager, cls).__new__(cls)
         return cls._instance
+
+    def __init__(self):
+        self.listeners = {}  # Dictionnary of string to list of function
 
     def add_listener(self, name, listener):
         listener_list = self.listeners.get(name)
