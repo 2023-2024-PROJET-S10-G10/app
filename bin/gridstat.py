@@ -122,6 +122,36 @@ def cli(campaign, dump, full, offset, events, job, cinfos, headerless, pretty, u
     """
     This command allow the user to gather information about the current campaigns.
     """
+
+    # Checking option content
+    defaultBehavior = False
+
+    if campaign is None and job is None and username is None:
+        defaultBehavior = True
+
+    if offset is not None:
+        full = True
+
+    if cinfos and campaign is not None:
+        raise click.MissingParameter("Must provide a campaign ID using --campaign to use --cinfos", param_type="campaign ID")
+
+    if full and campaign is not None:
+        raise click.MissingParameter("Must provide a campaign ID using --campaign to use --full", param_type="campaign ID")
+
+    if events and campaign is None:
+        raise click.MissingParameter("Must provide a campaign ID using --campaign to use --events", param_type="campaign ID")
+
+    if jdl and campaign is None:
+        raise click.MissingParameter("Must provide a campaign ID using --campaign to use --jdl", param_type="campaign ID")
+
+    if stdout and events is None:
+        raise click.MissingParameter("Must provide an event ID using --events to use --stdout", param_type="event ID")
+
+    if stderr and events is None:
+        raise click.MissingParameter("Must provide an event ID using --events to use --stderr", param_type="event ID")
+
+    # Function implementation
+
     raise RuntimeError("NYI")
 
 

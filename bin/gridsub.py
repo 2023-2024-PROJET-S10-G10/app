@@ -26,7 +26,7 @@ class ID(int):
     name = "ID"
 
 
-class JDL_FILE(int):
+class JDL_FILE(str):
     name = "JDL_FILE"
 
 
@@ -76,7 +76,15 @@ def cli(campaign, details, file, jobfile, json, jsonjob):
     """
     This command allow the user to submit campaigns to CiGri.
     """
-    # raise RuntimeError("NYI")
+
+    # Checking option content
+
+    if file is None and jobfile is None and json is None and jsonjob is None:
+        raise click.MissingParameter("Must provide one of the four --file, --jobfile, --json, --jsonjob option", param_type="option")
+
+    # Function implementation
+
+    raise RuntimeError("NYI")
 
 
 if __name__ == "__main__":
