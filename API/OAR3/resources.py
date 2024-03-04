@@ -1,5 +1,6 @@
 from API.OAR3.apiclient import ApiClient
 
+
 class ResourceAPI:
     def __init__(self, client: ApiClient = None):
         if client is None:

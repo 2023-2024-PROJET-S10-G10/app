@@ -1,5 +1,6 @@
 from API.OAR3.apiclient import ApiClient
 
+
 class JobAPI:
     def __init__(self, client: ApiClient = None):
         if client is None:
@@ -7,7 +8,8 @@ class JobAPI:
         else:
             self.client = client
 
-    def jobs(self, user=None, start_time=None, stop_time=None, states=None, array=None, job_ids=None, details=None, offset=0, limit=500):
+    def jobs(self, user=None, start_time=None, stop_time=None, states=None, array=None, job_ids=None, details=None,
+             offset=0, limit=500):
         """
         :return: une liste paginée des jobs selon divers critères tels que l'utilisateur, les dates de début et de fin, les états, et les identifiants des emplois.
         """

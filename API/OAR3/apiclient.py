@@ -66,13 +66,14 @@ class ApiClient:
         """
         return self.send_request("POST", url, headers, body)
 
-class ApiClientStub(ApiClient):
 
+class ApiClientStub(ApiClient):
     class SocketStub(io.BytesIO):
         def makefile(self, _):
             pass
 
-    def __init__(self, url="localhost", response_content=b"<html><body><h1>404 Error</h1></body></html>", status=404, headers={}):
+    def __init__(self, url="localhost", response_content=b"<html><body><h1>404 Error</h1></body></html>", status=404,
+                 headers={}):
         self.url = url
         self.response_content = response_content
         self.status = status
