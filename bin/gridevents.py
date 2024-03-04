@@ -71,6 +71,29 @@ def cli(verbose, campaign, glob, event, fix, resubmit, all):
     """
     This command allow the user to manage the events.
     """
+
+    # Checking option content
+
+    if resubmit and not fix:
+        raise click.BadOptionUsage("--resubmit", "Must provide --fix to resubmit a job")
+
+    if event is not None and campaign is not None:
+        raise click.BadOptionUsage(["--campaign", "--event"], "Can't provide both campaign id and event id")
+
+    if event is None or campaign is None:
+        raise click.MissingParameter("Must provide an event id or a campaign ID", param_type="option")
+
+    if event is not None and all:
+        raise click.BadOptionUsage("--all", "Can't provide --all parameter for an event")
+
+    if campaign:
+        fix = True
+
+    if event:
+        fix = True
+
+    # Function implementation
+
     raise RuntimeError("NYI")
 
 

@@ -61,6 +61,23 @@ def cli(list, mail, unsubscribe, severity, verbose):
     """
     This command allow the user to manage the notification.
     """
+
+    # Checking option content
+
+    if list and mail is not None or unsubscribe or severity is not None:
+        raise click.BadOptionUsage("--list", "--list must be provide alone")
+
+    if severity is not None and mail is None:
+        raise click.BadOptionUsage("--severity", "An email must be provided using (--mail) when using --severity")
+
+    if unsubscribe and mail is None:
+        raise click.BadOptionUsage("--unsubscribe", "An email must be provided using (--mail) when using --unsubscribe")
+
+    if unsubscribe and severity is not None:
+        raise click.BadOptionUsage("[--unsubscribe, --severity]", "Can't use both --severity and --unsubscribe")
+
+    # Function implementation
+
     raise RuntimeError("NYI")
 
 

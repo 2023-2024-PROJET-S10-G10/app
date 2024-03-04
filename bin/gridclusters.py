@@ -48,6 +48,25 @@ def cli(infos, more_infos, usage, bars):
     """
     This command allow the user to gatheir information on the different clusters.
     """
+
+    # Checking option content
+    defaultBehavior = False
+
+    if (more_infos):
+        infos = True
+
+    if (usage):
+        infos = True
+
+    if (bars):
+        infos = True
+        usage = True
+
+    if not infos and not more_infos and not usage and not bars:
+        defaultBehavior = True
+
+    # Function implementation
+
     raise RuntimeError("NYI")
 
 
