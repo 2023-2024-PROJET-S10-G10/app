@@ -30,11 +30,11 @@ class Manager:
         except ValueError:
             pass
 
-    def trigger_event(self, name):
+    def trigger_event(self, name, *args, **kwargs):
         listener_list = self.listeners.get(name)
 
         if listener_list is None:
             return
 
         for listener in listener_list:
-            listener()
+            listener(*args, **kwargs)

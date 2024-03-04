@@ -153,3 +153,34 @@ class TestEventManager(TestManager):
         manager = Manager()
 
         manager.trigger_event("triggerEventWithoutListener")
+
+    def methodWithParameters(self):
+        l = [0, 0]
+
+        def inc(i):
+            l[i] += 1
+
+        manager = Manager()
+
+        manager.add_listener_method("differentEventAndDifferentFunctionTrigger", inc)
+
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 0)
+        self.assertEqual(l, [1, 0])
+
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 1)
+        self.assertEqual(l, [1, 1])
+
+        manager.remove_listener("differentEventAndDifferentFunctionTrigger", inc)
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 1)
+        self.assertEqual(l, [1, 1])
+
+        manager.add_listener_method("differentEventAndDifferentFunctionTrigger", inc)
+
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 0)
+        self.assertEqual(l, [2, 1])
+
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 0)
+        self.assertEqual(l, [3, 1])
+
+        manager.trigger_event("differentEventAndDifferentFunctionTrigger", 1)
+        self.assertEqual(l, [3, 2])
