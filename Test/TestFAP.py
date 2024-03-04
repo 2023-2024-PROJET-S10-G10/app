@@ -1,6 +1,7 @@
 from Manager.FAP import FAP
 from TestManager import TestManager
 
+
 class appendUT(TestManager):
 
     def addElement_ElementAddedAtTheEnd(self):
