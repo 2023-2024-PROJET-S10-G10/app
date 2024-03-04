@@ -1,4 +1,3 @@
-
 # Higher priority = Higher number
 
 class FAP:
