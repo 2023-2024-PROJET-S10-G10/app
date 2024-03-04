@@ -100,9 +100,9 @@ users_mapping = Table(
 campagnes = Table(
     "campaigns",
     metadata_obj,
-    Column("id", Integer, primary_key=True),
+    Column("id", Integer, primary_key=True, index=True),
     Column("grid_user", String(255), nullable=False),
-    Column("state", Enum(campaign_state), nullable=False),
+    Column("state", Enum(campaign_state), nullable=False, index=True),
     Column("type", String(255), nullable=False),
     Column("name", String(255)),
     Column("submission_time", TIMESTAMP),   # manque p'tet la spécification time zone, pour tout les TIMESTAMP d'ailleurs, faire une manip au ctrl h
@@ -116,7 +116,7 @@ campaign_properties = Table(
     metadata_obj,
     Column("id", Integer, primary_key=True),
     Column("cluster_id", Integer),   # if NULL, then it's a global
-    Column("campaign_id", Integer, nullable=False),
+    Column("campaign_id", Integer, nullable=False),     # Double index, je sais pas encore comment faire
     Column("name", String(255), nullable=False),
     Column("value", Text, nullable=False)
 )
@@ -124,18 +124,19 @@ campaign_properties = Table(
 parameters = Table(
     "parameters",
     metadata_obj,
-    Column("id", Integer, primary_key=True, autoincrement=True),    # devrait être un bigserial
-    Column("campaign_id", Integer, nullable=False),
+    Column("id", Integer, primary_key=True, autoincrement=True, index=True),    # devrait être un bigserial
+    Column("campaign_id", Integer, nullable=False, index=True),
     Column("name", String(255)),
     Column("param", Text),
     # manque une contrainte d'unicité sur le couple name et campagne_id
+    UniqueConstraint('name','campaign_id', name='UniqueNameForCampaign')
 )
 
 bag_of_tasks = Table(
     "bag_of_tasks",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True),
-    Column("campaign_id", Integer, nullable=False),
+    Column("id", BigInteger, primary_key=True, index=True),
+    Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False),
     Column("priority", Integer, nullable=False, default=10),
 )
@@ -145,7 +146,7 @@ jobs_to_launch = Table(
     metadata_obj,
     Column("id", BigInteger, primary_key=True),
     Column("task_id", BigInteger, nullable=False),
-    Column("cluster_id", Integer, nullable=False),
+    Column("cluster_id", Integer, nullable=False, index=True),
     Column("tag", String(255)),
     Column("queuing_date", TIMESTAMP),
     Column("runner_options", Text),
@@ -155,13 +156,13 @@ jobs_to_launch = Table(
 jobs = Table(
     "jobs",
     metadata_obj,
-    Column("id", Integer, primary_key=True),
-    Column("campaign_id", Integer, nullable=False),
-    Column("param_id", Integer, nullable=False),
-    Column("batch_id", Integer),
-    Column("cluster_id", Integer),
+    Column("id", Integer, primary_key=True, index=True),
+    Column("campaign_id", Integer, nullable=False, index=True),
+    Column("param_id", Integer, nullable=False, index=True),
+    Column("batch_id", Integer, index=True),
+    Column("cluster_id", Integer, index=True),
     Column("collect_id", Integer),
-    Column("state", Enum(job_state), nullable=False),
+    Column("state", Enum(job_state), nullable=False, index=True),
     Column("return_code", Integer),
     Column("submission_time", TIMESTAMP),
     Column("start_time", TIMESTAMP),
@@ -169,23 +170,23 @@ jobs = Table(
     Column("node_name", String(255)),
     Column("resources_used", Integer),
     Column("remote_id", BigInteger),
-    Column("tag", String(255)),
+    Column("tag", String(255), index=True),
     Column("runner_options", Text),
 )
 
 events = Table(
     "events",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True),
-    Column("class", Enum(event_class),nullable=False),
-    Column("code", String(32), nullable=False),
-    Column("state", Enum(event_state), nullable=False),
-    Column("job_id", Integer),
-    Column("cluster_id", Integer),
-    Column("campaign_id", Integer),
+    Column("id", BigInteger, primary_key=True, index=True),
+    Column("class", Enum(event_class),nullable=False, index=True),
+    Column("code", String(32), nullable=False, index=True),
+    Column("state", Enum(event_state), nullable=False, index=True),
+    Column("job_id", Integer, index=True),
+    Column("cluster_id", Integer, index=True),
+    Column("campaign_id", Integer, index=True),
     Column("parent", Integer),
     Column("checked", Enum(checkbox)),
-    Column("notified", Boolean, nullable=False, default=False),
+    Column("notified", Boolean, nullable=False, default=False, index=True),
     Column("date_open", TIMESTAMP),
     Column("date_closed", TIMESTAMP),
     Column("date_update", TIMESTAMP),
@@ -198,7 +199,7 @@ queue_counts = Table(
     Column("date", TIMESTAMP),
     Column("campaign_id", Integer),
     Column("cluster_id", Integer),
-    Column("jobs_count", Integer),
+    Column("jobs_count", Integer),  # double index
 )
 
 admission_rules = Table(
@@ -212,18 +213,19 @@ user_notifications = Table(
     "user_notifications",
     metadata_obj,
     Column("id", Integer, primary_key=True),
-    Column("grid_user", String(255), nullable=False),
+    Column("grid_user", String(255), nullable=False, index=True),
     Column("type", Enum(notifications)),
     Column("identity", String(255)),
     Column("severity", String(32)),
     # contrainte unique
+    UniqueConstraint('grid_user','identity','type', name='UniqueUserNotification')
 )
 
 grid_usage = Table(
     "grid_usage",
     metadata_obj,
     Column("id", BigInteger, nullable=False),
-    Column("date", TIMESTAMP, nullable=False),
+    Column("date", TIMESTAMP, nullable=False, index=True),
     Column("cluster_id", Integer),
     Column("max_resources", Integer),
     Column("used_resources", Integer),
@@ -235,26 +237,26 @@ users_priority = Table(
     "users_priority",
     metadata_obj,
     Column("id", Integer, nullable=False),
-    Column("grid_user", String(255), nullable=False),
-    Column("cluster_id", Integer, nullable=False),
+    Column("grid_user", String(255), nullable=False, index=True),
+    Column("cluster_id", Integer, nullable=False, index=True),
     Column("priority", Integer, nullable=False),
 )
 
 tasks_affinity = Table(
     "tasks_affinity",
     metadata_obj,
-    Column("id", BigInteger, nullable=False),
-    Column("param_id", Integer, nullable=False),
-    Column("cluster_id", Integer, nullable=False),
+    Column("id", BigInteger, nullable=False, index=True),
+    Column("param_id", Integer, nullable=False, index=True),
+    Column("cluster_id", Integer, nullable=False, index=True),
     Column("priority", Integer, nullable=False),
 )
 
 taps = Table(
     "taps",
     metadata_obj,
-    Column("id", BigInteger, nullable=False),
+    Column("id", BigInteger, nullable=False, index=True),
     Column("cluster_id", Integer, nullable=False),
-    Column("campaign_id", Integer, nullable=False),
+    Column("campaign_id", Integer, nullable=False), # double index
     Column("state", Enum(tap_state), nullable=False, default=tap_state(1)),
     Column("rate", BigInteger, nullable=False),
     Column("close_date", TIMESTAMP),
