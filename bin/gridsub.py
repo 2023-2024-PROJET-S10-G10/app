@@ -6,14 +6,8 @@ click.rich_click.OPTION_GROUPS = {
             "name": "Basic options",
             "options": ["--campaign", "--details"],
         },
-        {
-            "name": "JDL options",
-            "options": ["--file", "--jobfile"]
-        },
-        {
-            "name": "JSON options",
-            "options": ["--json", "--jsonjob"]
-        },
+        {"name": "JDL options", "options": ["--file", "--jobfile"]},
+        {"name": "JSON options", "options": ["--json", "--jsonjob"]},
         {
             "name": "Advanced options",
             "options": ["--verbose", "--version", "--help"],
@@ -36,40 +30,40 @@ class JSON(str):
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
-    "-c", "--campaign",
+    "-c",
+    "--campaign",
     type=ID,
     default=None,
-    help="Add jobs in an existing campaign"
+    help="Add jobs in an existing campaign",
 )
 @click.option(
-    "-d", "--details",
+    "-d",
+    "--details",
     default=False,
     is_flag=True,
-    help="Prints all the JSON of the campaign instead of just the ID"
+    help="Prints all the JSON of the campaign instead of just the ID",
 )
 @click.option(
-    "-f", "--file",
+    "-f",
+    "--file",
     type=JDL_FILE,
     default=None,
-    help="JDL File containing the JSON"
+    help="JDL File containing the JSON",
 )
 @click.option(
-    "-F", "--jobfile",
+    "-F",
+    "--jobfile",
     type=JDL_FILE,
     default=None,
-    help="JDL File containing an array of parameters"
+    help="JDL File containing an array of parameters",
 )
+@click.option("-j", "--json", type=JSON, default=None, help="JSON String")
 @click.option(
-    "-j", "--json",
+    "-J",
+    "--jsonjob",
     type=JSON,
     default=None,
-    help="JSON String"
-)
-@click.option(
-    "-J", "--jsonjob",
-    type=JSON,
-    default=None,
-    help="JSON String containing an array of parameters"
+    help="JSON String containing an array of parameters",
 )
 @click.version_option("4.0.0", prog_name="CiGri")
 def cli(campaign, details, file, jobfile, json, jsonjob):
@@ -80,7 +74,10 @@ def cli(campaign, details, file, jobfile, json, jsonjob):
     # Checking option content
 
     if file is None and jobfile is None and json is None and jsonjob is None:
-        raise click.MissingParameter("Must provide one of the four --file, --jobfile, --json, --jsonjob option", param_type="option")
+        raise click.MissingParameter(
+            "Must provide one of the four --file, --jobfile, --json, --jsonjob option",
+            param_type="option",
+        )
 
     # Function implementation
 

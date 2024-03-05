@@ -1,5 +1,6 @@
 from TestManager import TestManager
 
+
 class AssertUT(TestManager):
     def assertTrue_validateTest(self):
         self.assertTrue(True)

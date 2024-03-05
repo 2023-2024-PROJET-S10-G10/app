@@ -1,7 +1,7 @@
 # Higher priority = Higher number
 
-class FAP:
 
+class FAP:
     def __init__(self):
         self.elements = []
 
@@ -10,7 +10,9 @@ class FAP:
 
     def next(self):
         highestPriority = max([p.priority for p in self.elements])
-        lastElement = [e for e in self.elements if e.priority == highestPriority][0]
+        lastElement = [
+            e for e in self.elements if e.priority == highestPriority
+        ][0]
         self.elements.remove(lastElement)
         return lastElement.value
 
