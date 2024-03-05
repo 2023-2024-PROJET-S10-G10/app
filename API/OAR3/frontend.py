@@ -1,5 +1,6 @@
 from API.apiclient import ApiClient
 
+
 class FrontendAPI:
     def __init__(self, client: ApiClient = None):
         if client is None:

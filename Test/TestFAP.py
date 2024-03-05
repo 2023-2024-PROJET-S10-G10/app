@@ -3,7 +3,6 @@ from TestManager import TestManager
 
 
 class appendUT(TestManager):
-
     def addElement_ElementAddedAtTheEnd(self):
         fap = FAP()
         e1 = "test1"

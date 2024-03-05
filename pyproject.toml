@@ -11,6 +11,11 @@ SQLAlchemy = "2.0"
 fastapi = "^0.109.0"
 rich-click = "^1.7.3"
 
+[tool.poetry.dev-dependencies]
+black = "*"
+flake8 = "*"
+pre-commit = "*"
+
 
 [build-system]
 requires = ["poetry-core"]

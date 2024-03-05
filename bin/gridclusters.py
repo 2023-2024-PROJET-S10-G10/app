@@ -8,7 +8,7 @@ click.rich_click.OPTION_GROUPS = {
         },
         {
             "name": "Visualization customization option",
-            "options": ["--usage", "--bars"]
+            "options": ["--usage", "--bars"],
         },
         {
             "name": "Advanced options",
@@ -20,28 +20,32 @@ click.rich_click.OPTION_GROUPS = {
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
-    "-i", "--infos",
+    "-i",
+    "--infos",
     default=False,
     is_flag=True,
-    help="Show infos about each cluster"
+    help="Show infos about each cluster",
 )
 @click.option(
-    "-I", "--more_infos",
+    "-I",
+    "--more_infos",
     default=False,
     is_flag=True,
-    help="Show detailed infos about each cluster"
+    help="Show detailed infos about each cluster",
 )
 @click.option(
-    "-u", "--usage",
+    "-u",
+    "--usage",
     default=False,
     is_flag=True,
-    help="Show usage infos about each cluster (implies -i)"
+    help="Show usage infos about each cluster (implies -i)",
 )
 @click.option(
-    "-b", "--bars",
+    "-b",
+    "--bars",
     default=False,
     is_flag=True,
-    help="Show usage infos with colored bars (implies -i -u)"
+    help="Show usage infos with colored bars (implies -i -u)",
 )
 @click.version_option("4.0.0", prog_name="CiGri")
 def cli(infos, more_infos, usage, bars):
@@ -52,13 +56,13 @@ def cli(infos, more_infos, usage, bars):
     # Checking option content
     defaultBehavior = False
 
-    if (more_infos):
+    if more_infos:
         infos = True
 
-    if (usage):
+    if usage:
         infos = True
 
-    if (bars):
+    if bars:
         infos = True
         usage = True
 
