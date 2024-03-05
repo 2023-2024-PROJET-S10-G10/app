@@ -39,8 +39,8 @@ def jdl_parser(json_file):
     proc_params(json_block, id_campaign)
 
     for param in json_block["params"]:
-        addParam (id_campaign, param)   #, json_block["name"]
-        id_params = selectParam(id_campaign, json_block["name"], param)
+        addParamWithoutName (id_campaign, param)   #, json_block["name"]
+        id_params = selectParam(id_campaign, param)   #, json_block["name"]
         id_job = addJob (id_campaign, id_params) 
     
         id_event = addEvent (2, id_job, "CREATED", "Campaign created")
