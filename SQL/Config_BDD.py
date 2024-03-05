@@ -105,7 +105,7 @@ authentification = Table(
     Column("grid_login", String(255), nullable=False),
     Column("cluster_id", Integer, nullable=False),
     Column("JWT", String(255), nullable=False),
-    # contrainte unique
+    UniqueConstraint('grid_login', 'cluster_id', name='UniqueJWTPerUser')
 )
 
 users_mapping = Table(
@@ -149,7 +149,7 @@ parameters = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("name", String(255)),
     Column("param", Text),
-    #UniqueConstraint('campaign_id', 'name', name='UniqueNameForCampaign')
+    UniqueConstraint('campaign_id', 'name', name='UniqueParamPerName')
 )
 
 bag_of_tasks = Table(
@@ -159,6 +159,7 @@ bag_of_tasks = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False),
     Column("priority", Integer, nullable=False, default=10),
+    UniqueConstraint('campaign_id', 'param_id', name='UniquePriorityPerParam')
 )
 
 jobs_to_launch = Table(
@@ -180,7 +181,7 @@ jobs = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False, index=True),
     Column("batch_id", Integer, index=True),
-    Column("cluster_id", Integer, index=True),
+    Column("cluster_id", Integer, index=True),     #<- mettre depuis le jdl parser
     Column("collect_id", Integer),
     Column("state", Enum(job_state), nullable=False, index=True),
     Column("return_code", Integer),
