@@ -1,4 +1,4 @@
-from API.OAR3.apiclient import ApiClientStub
+from API.apiclient import ApiClientStub
 from TestManager import TestManager
 
 class send_requestUT(TestManager):

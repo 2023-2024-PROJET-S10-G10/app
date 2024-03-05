@@ -81,13 +81,13 @@ class ApiClientStub(ApiClient):
         self.mockedValue = {"getdefault": response}
 
     def mock(self, method, url, status=200, headers={}, body=b''):
-        self.mockedValue[method + url] = {'content': body,
-                                          'status': status,
-                                          'headers': headers
-                                          }
+        self.mockedValue[method.lower() + url] = {'content': body,
+                                                  'status': status,
+                                                  'headers': headers
+                                                  }
 
     def send_request(self, method, url="getdefault", headers={}, body={}):
-        response = self.mockedValue.get(method + url, self.mockedValue["getdefault"])
+        response = self.mockedValue.get(method.lower() + url, self.mockedValue["getdefault"])
         conn = http.client.HTTPConnection("getdefault")
 
         simulated_response = http.client.HTTPResponse(ApiClientStub.SocketStub(response['content']))

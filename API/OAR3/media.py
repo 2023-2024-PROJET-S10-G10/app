@@ -1,4 +1,4 @@
-from API.OAR3.apiclient import ApiClient
+from API.apiclient import ApiClient
 
 
 class MediaAPI:
