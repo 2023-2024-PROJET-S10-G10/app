@@ -12,70 +12,39 @@ def get_json(json_file):
     with open(json_file, 'r') as f:
         json_block = json.load(f)
     return json_block
-"""
-def parse_params(param_string):
-    params_list = []
-    for param in param_string:
-        params_list.append(param.split(" "))
-    return params_list
 
-def print_params_cluster(cluster):
-    for key in jdlKeys:
-        param(key, cluster)
-
-def param(key, cluster):
-    value = cluster.get(key)
-    print(f"-->{key}:", value if value is not None else "None")
-"""
 def getProjectName(cluster):
     return cluster.get("project")
 
 
-def print_params(json_block, id_campaign):
-    """
-    print("==> name:", json_block["name"])
-    print("==> jobs type:", json_block["jobs_type"])
-    print(f"==> clusters used number:{len(json_block['clusters'])} ({', '.join(json_block['clusters'].keys())})")
-    """
-
+def proc_params(json_block, id_campaign):
     clusters = json_block["clusters"]
 
     for name_cluster in nameCluster:
         if name_cluster in clusters:
             id_cluster = selectCluster(name_cluster)
             cluster = clusters[name_cluster]
-            """
-            print_params_cluster(cluster)
-            print(f"-> {name_cluster} ({id_cluster})")
-            """
+            
             addCampProp(id_campaign, id_cluster, getProjectName(cluster), json.dumps(cluster)) #json_block["clusters"][name_cluster]
-        """
-        else:
-            print(f"-> {name_cluster}: None")
-        """
 
 def jdl_parser(json_file):
 
     json_block = get_json(json_file)
+
     #TODO: Replace environment variable by a better solution (security)
     user = os.environ.get("USER")
-    addCampaign(user, json_block["name"], json_block["jobs_type"], len(json_block["params"]), json.dumps(json_block))
     
-    id_campaign = selectCampaign(user, json_block["name"], json_block["jobs_type"], len(json_block["params"]), json.dumps(json_block))
+    id_campaign = addCampaign(user, json_block["name"], json_block["jobs_type"], len(json_block["params"]), json.dumps(json_block))
 
-    print_params(json_block, id_campaign)
-    """
-    print("==> jobs number:", len(json_block["params"]))
-
-    print("==> parameters:", parse_params(json_block["params"]))
-    """
+    proc_params(json_block, id_campaign)
 
     for param in json_block["params"]:
-        #print("->", param)
-        addParam (id_campaign, json_block["name"], param)
+        addParam (id_campaign, param)   #, json_block["name"]
         id_params = selectParam(id_campaign, json_block["name"], param)
-        addJob (id_campaign, id_params) 
+        id_job = addJob (id_campaign, id_params) 
     
+        id_event = addEvent (2, id_job, "CREATED", "Campaign created")
+
         
 if __name__ == "__main__":
     if len(sys.argv) != 2:
