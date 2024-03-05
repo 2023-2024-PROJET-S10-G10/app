@@ -3,8 +3,25 @@ from sqlalchemy import *
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from typing import Optional, List
 from datetime import datetime
+import sys, os
 
-engine = create_engine("sqlite+pysqlite:///SQL/mycigri.db", echo=True)
+sys.path.append(sys.path[0].replace("/SQL", ""))
+
+from utils.sql import *
+
+path_exec = os.getcwd()
+
+if path_exec.endswith("/app/Test"):
+    path = path_DB_test
+elif path_exec.endswith("/app"):
+    path = path_DB
+else:
+    print("You are not in the right directory")
+    print("If you want to use the test database, go to app/Test")
+    print("If you want to use the production database, go to app")
+    sys.exit(1)
+
+engine = create_engine(path, echo=True)
 
 metadata_obj = MetaData()
 
@@ -19,7 +36,6 @@ class auth_type(enum.Enum):
     JWT = 4
 
 class campaign_state(enum.Enum):
-    create_constraint = True
     cancelled = 1
     in_treatment = 2
     paused = 3
@@ -87,6 +103,15 @@ cluster_table = Table(
     CheckConstraint("api_auth_type IN ('none', 'password', 'cert', 'JWT')", name="enum_auth"),
 )
 
+authentification = Table(
+    "authentification",
+    metadata_obj,
+    Column("id", Integer, primary_key=True),
+    Column("grid_login", String(255), nullable=False),
+    Column("cluster_id", Integer, nullable=False),
+    Column("JWT", String(255), nullable=False),
+    # contrainte unique
+)
 
 users_mapping = Table(
     "users_mapping",
@@ -128,14 +153,13 @@ parameters = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("name", String(255)),
     Column("param", Text),
-    # manque une contrainte d'unicité sur le couple name et campagne_id
-    UniqueConstraint('name','campaign_id', name='UniqueNameForCampaign')
+    #UniqueConstraint('campaign_id', 'name', name='UniqueNameForCampaign')
 )
 
 bag_of_tasks = Table(
     "bag_of_tasks",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True, index=True),
+    Column("id", Integer, primary_key=True, index=True),
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False),
     Column("priority", Integer, nullable=False, default=10),
@@ -144,8 +168,8 @@ bag_of_tasks = Table(
 jobs_to_launch = Table(
     "jobs_to_launch",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True),
-    Column("task_id", BigInteger, nullable=False),
+    Column("id", Integer, primary_key=True),
+    Column("task_id", Integer, nullable=False),
     Column("cluster_id", Integer, nullable=False, index=True),
     Column("tag", String(255)),
     Column("queuing_date", TIMESTAMP),
@@ -169,7 +193,7 @@ jobs = Table(
     Column("stop_time", TIMESTAMP),
     Column("node_name", String(255)),
     Column("resources_used", Integer),
-    Column("remote_id", BigInteger),
+    Column("remote_id", Integer),
     Column("tag", String(255), index=True),
     Column("runner_options", Text),
 )
@@ -177,8 +201,8 @@ jobs = Table(
 events = Table(
     "events",
     metadata_obj,
-    Column("id", BigInteger, primary_key=True, index=True),
-    Column("class", Enum(event_class),nullable=False, index=True),
+    Column("id", Integer, primary_key=True, index=True),
+    Column("class_e", Enum(event_class),nullable=False, index=True),
     Column("code", String(32), nullable=False, index=True),
     Column("state", Enum(event_state), nullable=False, index=True),
     Column("job_id", Integer, index=True),
@@ -217,14 +241,13 @@ user_notifications = Table(
     Column("type", Enum(notifications)),
     Column("identity", String(255)),
     Column("severity", String(32)),
-    # contrainte unique
     UniqueConstraint('grid_user','identity','type', name='UniqueUserNotification')
 )
 
 grid_usage = Table(
     "grid_usage",
     metadata_obj,
-    Column("id", BigInteger, nullable=False),
+    Column("id", Integer, nullable=False),
     Column("date", TIMESTAMP, nullable=False, index=True),
     Column("cluster_id", Integer),
     Column("max_resources", Integer),
@@ -245,7 +268,7 @@ users_priority = Table(
 tasks_affinity = Table(
     "tasks_affinity",
     metadata_obj,
-    Column("id", BigInteger, nullable=False, index=True),
+    Column("id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False, index=True),
     Column("cluster_id", Integer, nullable=False, index=True),
     Column("priority", Integer, nullable=False),
@@ -254,13 +277,12 @@ tasks_affinity = Table(
 taps = Table(
     "taps",
     metadata_obj,
-    Column("id", BigInteger, nullable=False, index=True),
+    Column("id", Integer, nullable=False, index=True),
     Column("cluster_id", Integer, nullable=False),
     Column("campaign_id", Integer, nullable=False), # double index
     Column("state", Enum(tap_state), nullable=False, default=tap_state(1)),
-    Column("rate", BigInteger, nullable=False),
+    Column("rate", Integer, nullable=False),
     Column("close_date", TIMESTAMP),
-
 )
 
 class Base(DeclarativeBase):
