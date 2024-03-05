@@ -41,12 +41,6 @@ class campaign_state(enum.Enum):
     paused = 3
     terminated = 4
 
-class campaign_state2(enum.Enum):
-    cancelled = "cancelled"
-    in_treatment = "in_treatment"
-    paused = "paused"
-    terminated = "terminated"
-
 class job_state(enum.Enum):
     to_launch = 1
     launching = 2
@@ -100,7 +94,8 @@ cluster_table = Table(
     Column("properties", String(255)),
     Column("stress_factor", Float, default=0),
     Column("enabled", Boolean, default=true()),
-    CheckConstraint("api_auth_type IN ('none', 'password', 'cert', 'JWT')", name="enum_auth"),
+    CheckConstraint(f"api_auth_type IN ({str(auth_type._member_names_)[1:-1]})", name="enum_auth"),
+    CheckConstraint(f"batch IN ({str(api._member_names_)[1:-1]})", name="enum_batch"),
 )
 
 authentification = Table(
@@ -133,7 +128,8 @@ campagnes = Table(
     Column("submission_time", TIMESTAMP),   # manque p'tet la spécification time zone, pour tout les TIMESTAMP d'ailleurs, faire une manip au ctrl h
     Column("completion_time", TIMESTAMP),
     Column("nb_jobs", Integer),
-    Column("jdl", Text)
+    Column("jdl", Text),
+    CheckConstraint(f"state IN ({str(campaign_state._member_names_)[1:-1]})", name="enum_state"),
 )
 
 campaign_properties = Table(
@@ -196,6 +192,7 @@ jobs = Table(
     Column("remote_id", Integer),
     Column("tag", String(255), index=True),
     Column("runner_options", Text),
+    CheckConstraint(f"state IN ({str(job_state._member_names_)[1:-1]})", name="enum_state"),
 )
 
 events = Table(
@@ -215,6 +212,9 @@ events = Table(
     Column("date_closed", TIMESTAMP),
     Column("date_update", TIMESTAMP),
     Column("message", Text),
+    CheckConstraint(f"state IN ({str(event_state._member_names_)[1:-1]})", name="enum_state"),
+    CheckConstraint(f"class_e IN ({str(event_class._member_names_)[1:-1]})", name="enum_class"),
+    CheckConstraint(f"checked IN ({str(checkbox._member_names_)[1:-1]})", name="enum_checkbox"),
 )
 
 queue_counts = Table(
@@ -241,7 +241,8 @@ user_notifications = Table(
     Column("type", Enum(notifications)),
     Column("identity", String(255)),
     Column("severity", String(32)),
-    UniqueConstraint('grid_user','identity','type', name='UniqueUserNotification')
+    UniqueConstraint('grid_user','identity','type', name='UniqueUserNotification'),
+    CheckConstraint(f"type IN ({str(notifications._member_names_)[1:-1]})", name="enum_notification"),
 )
 
 grid_usage = Table(
@@ -283,6 +284,7 @@ taps = Table(
     Column("state", Enum(tap_state), nullable=False, default=tap_state(1)),
     Column("rate", Integer, nullable=False),
     Column("close_date", TIMESTAMP),
+    CheckConstraint(f"state IN ({str(tap_state._member_names_)[1:-1]})", name="enum_state"),
 )
 
 class Base(DeclarativeBase):
