@@ -72,22 +72,30 @@ class ApiClientStub(ApiClient):
         def makefile(self, _):
             pass
 
-    def __init__(self, url="localhost", response_content=b"<html><body><h1>404 Error</h1></body></html>", status=404,
+    def __init__(self, body=b"<html><body><h1>404 Error</h1></body></html>", status=404,
                  headers={}):
-        self.url = url
-        self.response_content = response_content
-        self.status = status
-        self.headers = headers
+        response = {'content': body,
+                    'status': status,
+                    'headers': headers
+                    }
+        self.mockedValue = {"getdefault": response}
 
-    def send_request(self, method, url="localhost", headers={}, body={}):
-        conn = http.client.HTTPConnection("localhost")
+    def mock(self, method, url, status=200, headers={}, body=b''):
+        self.mockedValue[method + url] = {'content': body,
+                                          'status': status,
+                                          'headers': headers
+                                          }
 
-        simulated_response = http.client.HTTPResponse(ApiClientStub.SocketStub(self.response_content))
+    def send_request(self, method, url="getdefault", headers={}, body={}):
+        response = self.mockedValue.get(method + url, self.mockedValue["getdefault"])
+        conn = http.client.HTTPConnection("getdefault")
+
+        simulated_response = http.client.HTTPResponse(ApiClientStub.SocketStub(response['content']))
         simulated_response.chunked = False
         simulated_response.length = None
-        simulated_response.status = self.status
-        simulated_response.headers = self.headers
-        simulated_response.fp = io.BytesIO(self.response_content)
+        simulated_response.status = response['status']
+        simulated_response.headers = response['headers']
+        simulated_response.fp = io.BytesIO(response['content'])
 
         conn.close()
 
