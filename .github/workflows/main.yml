@@ -23,9 +23,15 @@ jobs:
           pip install poetry
           poetry install
 
+      - name: Create database
+        run: |
+          cd Test
+          poetry run python3 ../SQL/Config_BDD.py    
+
 
       - name: Exécuter les tests
         id: run-tests
         run: |
           cd Test
           poetry run python3 Test.py 0
+
