@@ -13,3 +13,6 @@ class AssertUT(TestManager):
 
     def assertNotEqual_validateTest(self):
         self.assertNotEqual(1, 2)
+
+    def assertRaises_validateTest(self):
+        self.assertRaises(lambda: 0 / 0)
