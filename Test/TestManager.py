@@ -1,6 +1,7 @@
 import json
 import traceback
 from datetime import datetime
+from typing import Callable
 
 
 class TestManager:
@@ -50,6 +51,16 @@ class TestManager:
                     expected, value
                 )
             )
+
+    @staticmethod
+    def assertRaises(toRun: Callable):
+        try:
+            toRun()
+        except Exception:
+            return
+        raise AssertionError(
+            "Assert Failed : Method didn't raise an exception"
+        )
 
     # Run all referenced tests
     def start(self):
