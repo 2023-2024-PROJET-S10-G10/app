@@ -1,5 +1,5 @@
 {
-    "name": "test_job",
+    "name": "test_several_params_several_clusters",
     "params": [
         "test-prefect true",
         "titi true",
