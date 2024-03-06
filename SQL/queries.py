@@ -42,6 +42,9 @@ def addCampaign (grid_user, name, type, nbjobs, jdl):
     return selectCampaign(grid_user, name, type, nbjobs, jdl, submission_time)
 
 def updateStateCampaign (id, state):    #TODO: add contraints
+    previous_state = selectCampState(id)
+    if previous_state == 1:
+        raise ValueError("The campaign is already killed.")
     updateCampaign = update(campagnes).where(campagnes.c.id == id).values(state = campaign_state(state))
     executeQuery(updateCampaign)
 
@@ -99,47 +102,6 @@ def selectEvent (date_open):
     selectEvent = select(events.c.id).where(events.c.date_open == date_open)
     return executeQueryReturn (selectEvent)
 
-def updateStateEvent (id, state):    #TODO: add contraints
-    if id <= 0:
-        raise ValueError("The id cannot be negative.")
-    date_open = datetime.now()
-    date_update = datetime.now()
-    updateEvent = update(events).where(events.c.id == id).values(state = event_state(state), date_update = date_update)
-    executeQuery(updateEvent)
-
-def updateClassEvent (id_event, class_e, id):
-    if id <= 0:
-        raise ValueError("The id cannot be negative.")
-    if id_event <= 0:
-        raise ValueError("The id_event cannot be negative.")
-    
-    date_open = datetime.now()
-    date_open = datetime.now()
-    date_update = datetime.now()
-    if class_e == 1:    #cluster
-        updateEvent = update(events).where(events.c.id == id_event).values(class_e = event_class(class_e), date_update = date_update, cluster_id = id)
-    elif class_e == 2:  #job
-        id_campaign = selectCampJobs(id)
-        updateEvent = update(events).where(events.c.id == id_event).values(class_e = event_class(class_e), campaign_id = id_campaign, job_id = id, date_update = date_update)
-    elif class_e == 3:  #campaign
-        updateEvent = update(events).where(events.c.id == id_event).values(class_e = event_class(class_e), campaign_id = id, date_update = date_update)
-    else: #others
-        return -1
-    executeQuery(updateEvent)
-
-def updateClassEvent (id_event, class_e):
-    if id_event <= 0:
-        raise ValueError("The id_event cannot be negative.")
-    
-    date_update = datetime.now()
-    if class_e == 4:  #notify
-        updateEvent = update(events).where(events.c.id == id_event).values(class_e = event_class(class_e), date_update = date_update)
-    elif class_e == 5:  #log
-        updateEvent = update(events).where(events.c.id == id_event).values(class_e = event_class(class_e), date_update = date_update)
-    else: #others
-        return -1
-    executeQuery(updateEvent)
-
 def updateParentEvent (id, parent):
     if id <= 0:
         raise ValueError("The id cannot be negative.")
@@ -192,6 +154,10 @@ def selectEventNotified (id):
     selectEventNotified = select(events.c.notified).where(events.c.id == id)
     return executeQueryReturn (selectEventNotified)
 
+def selectEventGlobal (id):
+    selectEvent = select(events.c.class_e, events.c.code, events.c.state, events.c.cluster_id, events.c.campaign_id, events.c.job_id, events.c.date_open, events.c.date_closed, events.c.date_update, events.c.parent, events.c.checked, events.c.notified, events.c.message).where(events.c.id == id)
+    return executeQueryReturn (selectEvent)
+
 def closeEvent (id):
     date_closed = datetime.now()
     closeEvent = update(events).where(events.c.id == id).values(state = event_state(2), date_closed = date_closed, date_update = date_closed)
@@ -238,8 +204,12 @@ def killJob (id):
     executeQuery(killJob)
 
 def addJob (campaign_id, param_id):
+    if campaign_id == None:
+        raise ValueError("The campaign_id cannot be None.")
     if campaign_id <= 0:
         raise ValueError("The campaign_id cannot be negative.")
+    if param_id == None:
+        raise ValueError("The param_id cannot be None.")
     if param_id <= 0:
         raise ValueError("The param_id cannot be negative.")
     
