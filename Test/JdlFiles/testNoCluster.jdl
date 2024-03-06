@@ -1,0 +1,14 @@
+{
+    "name": "test_no_cluster",
+    "params": [
+        "test-prefect true",
+        "titi true",
+        "tata false",
+        "toto false",
+        "tata true",
+        "titi false",
+        "toto true"
+    ],
+    "clusters": {},
+    "jobs_type": "normal"
+}
