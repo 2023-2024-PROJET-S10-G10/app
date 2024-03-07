@@ -1,4 +1,9 @@
 import rich_click as click
+import json
+
+import sys
+sys.path.append('../')
+from API.apiclient import ApiClient
 
 click.rich_click.OPTION_GROUPS = {
     "griddel.py": [
@@ -74,6 +79,14 @@ def cli(campaign_ids, pause, resume, purge, job, verbose):
     It can either edit the campaign state eitheir cancel a campaign job.
     """
 
+    client = ApiClient(host="localhost", port=4430, baseEndpoint='/cigri-api',
+                       headers={"Content-Type": "application/json",
+                                "Accept": "application/json"})
+
+    griddel(campaign_ids, pause, resume, purge, job, verbose, client)
+
+
+def griddel(campaign_ids, pause, resume, purge, job, verbose, client):
     # Checking option content
 
     if pause and resume:
@@ -91,13 +104,13 @@ def cli(campaign_ids, pause, resume, purge, job, verbose):
             ["--resume", "--purge"], "Can't resume and purge at the same time"
         )
 
-    if campaign_ids is None and job is None:
+    if not campaign_ids and job is None:
         raise click.MissingParameter(
             "Must provide at least a campaign id or a job id (using --campaign_ids ID1,ID2,IDN or --job ID)",
             param_type="option",
         )
 
-    if campaign_ids is not None and job is not None:
+    if campaign_ids and job is not None:
         raise click.BadOptionUsage(
             ["--campaign_ids", "--job"],
             "Can't provide both campaign ids and job id",
@@ -116,7 +129,36 @@ def cli(campaign_ids, pause, resume, purge, job, verbose):
 
     # Function implementation
 
-    raise RuntimeError("NYI")
+    if job is not None:
+        response = client.delete(f"/jobs/{job}")
+        content = json.loads(response.read())
+
+        if response.status != 202:
+            print(f"Failed to cancel job {job}: {content}.")
+        else:
+            if verbose:
+                print(response.read())
+
+    elif campaign_ids:
+        status = ""
+        if pause:
+            status = "?hold=1"
+        if resume:
+            status = "?resume=1"
+        if purge:
+            status = "?purge=1"
+
+        for campaign_id in campaign_ids:
+            response = client.delete(f"/campaigns/{campaign_id}{status}")
+            content = json.loads(response.read())
+
+            if response.status != 202:
+                print(f"Failed to cancel campaign {campaign_id}: {content}.")
+            else:
+                if verbose:
+                    print(content)
+    else:
+        raise RuntimeError("griddel shouldn't get called without a job id or a campaign id")
 
 
 if __name__ == "__main__":
