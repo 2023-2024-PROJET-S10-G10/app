@@ -206,14 +206,13 @@ class CancelCampaign(TestManager):
 
 
 ## PARAMETERS
-class QueriesParametersUT(TestManager):
+class CreateParameter(TestManager):
     # Create a campaign
     id_campaign = addCampaign("user", "name", 1, 1, "jdl")
 
-class CreateParameter(TestManager):
     # Create a parameter
     def CreateParameter(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name CP", "value CP")
+        id_param = addParam(CreateParameter.id_campaign, "name CP", "value CP")
         params = selectParams(id_param)
         name = selectParamName(id_param)
 
@@ -222,7 +221,7 @@ class CreateParameter(TestManager):
     
     # Create a parameter without name
     def CreateParameterWithoutName1(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "", "value CPWN1")
+        id_param = addParam(CreateParameter.id_campaign, "", "value CPWN1")
 
         params = selectParams(id_param)
         name = selectParamName(id_param)
@@ -232,7 +231,7 @@ class CreateParameter(TestManager):
         self.assertEqual(name, "")
 
     def CreateParameterWithoutName2(self):
-        id_param = addParamWithoutName(QueriesParametersUT.id_campaign, "value CPWN2")
+        id_param = addParamWithoutName(CreateParameter.id_campaign, "value CPWN2")
 
         params = selectParams(id_param)
         name = selectParamName(id_param)
@@ -242,7 +241,7 @@ class CreateParameter(TestManager):
     
     # Create a parameter without the parameter's value
     def CreateParameterWithoutValue(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name CPWV", "")
+        id_param = addParam(CreateParameter.id_campaign, "name CPWV", "")
         params = selectParams(id_param)
         name = selectParamName(id_param)
 
@@ -254,7 +253,7 @@ class CreateParameter(TestManager):
 class SelectParameterName(TestManager):
     # Return an existed name
     def SelectParameterName(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name SPN", "value SPN")
+        id_param = addParam(CreateParameter.id_campaign, "name SPN", "value SPN")
 
         name = selectParamName(id_param)
         self.assertEqual(name, "name SPN")
@@ -267,7 +266,7 @@ class SelectParameterName(TestManager):
 ### Update name
 class UpdateParameterName(TestManager):
     def UpdateParameterName(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name UPN", "value UPN")
+        id_param = addParam(CreateParameter.id_campaign, "name UPN", "value UPN")
 
         updateParamName(id_param, "new_name UPN")
         name = selectParamName(id_param)
@@ -276,7 +275,7 @@ class UpdateParameterName(TestManager):
 ### Update value
 class UpdateParameterValue(TestManager):
     def UpdateParameterValue(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name UPV", "value UPV")
+        id_param = addParam(CreateParameter.id_campaign, "name UPV", "value UPV")
 
         updateParamValue(id_param, "new_value UPV")
         params = selectParams(id_param)
@@ -286,7 +285,7 @@ class UpdateParameterValue(TestManager):
 class DeleteParameter(TestManager):
     # Delete an existed parameter
     def DeleteParameter(self):
-        id_param = addParam(QueriesParametersUT.id_campaign, "name DP", "value DP")
+        id_param = addParam(CreateParameter.id_campaign, "name DP", "value DP")
 
         deleteParam(id_param)
         params = selectParams(id_param)
@@ -299,54 +298,78 @@ class DeleteParameter(TestManager):
         self.assertEqual(params, None)
 
 ## JOBS
-class QueriesJobsUT(TestManager):   # TODO: create job for each test
+class CreateJob(TestManager):
     # Create a campaign
     id_campaign = addCampaign("user", "name", 1, 1, "jdl")
-    # Create a parameter
-    id_param = addParam(id_campaign, "name", "value")
 
-    ### Create a job
-    id_job = addJob(id_campaign, id_param)
-
-class CreateJob(TestManager):
     # Create a job with a campaign and a parameter
     def CreateJob(self):
-        self.assertNotEqual(QueriesJobsUT.id_job, None)
-        id_campaign_job = selectCampJobs(QueriesJobsUT.id_job)
-        self.assertEqual(QueriesJobsUT.id_campaign, id_campaign_job)
-        state = selectJobState(QueriesJobsUT.id_job)
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name CJ", "value CJ")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+
+        self.assertNotEqual(id_job, None)
+        id_campaign_job = selectCampJobs(id_job)
+        self.assertEqual(CreateJob.id_campaign, id_campaign_job)
+        state = selectJobState(id_job)
         self.assertEqual(state, job_state.to_launch)
-        id_param_job = selectJobParam(QueriesJobsUT.id_job)
-        self.assertEqual(id_param_job, QueriesJobsUT.id_param)
+        id_param_job = selectJobParam(id_job)
+        self.assertEqual(id_param_job, id_param)
 
     # Create a job without campaign
     def CreateJobWithoutCampaign(self):
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name CJWC", "value CJWC")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+
         try:
-            id_job = addJob(None, QueriesJobsUT.id_param)
+            id_job = addJob(None, id_param)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
     
     # Create a job with an unvalided id campaign
     def CreateJobWithUnvalableCampaign(self):
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name CJWUC", "value CJWUC")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
         try:
-            id_job = addJob(0, QueriesJobsUT.id_param)
+            id_job = addJob(0, id_param)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
 
     # Create a job without id parameter
     def CreateJobWithoutParameter(self):
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name CJWP", "value CJWP")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
         try:
-            id_job = addJob(QueriesJobsUT.id_campaign, None)
+            id_job = addJob(CreateJob.id_campaign, None)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
     
     # Create a job with an unvalided id parameter
     def CreateJobWithUnvalableParameter(self):
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name CJWUP", "value CJWUP")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
         try:
-            id_job = addJob(QueriesJobsUT.id_campaign, 0)
+            id_job = addJob(CreateJob.id_campaign, 0)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
@@ -355,18 +378,30 @@ class CreateJob(TestManager):
 class UpdateJobState(TestManager):
     # Update the state
     def UpdateJob(self):
-        updateStateJob(QueriesJobsUT.id_job, 3)
-        state = selectJobState(QueriesJobsUT.id_job)
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name UJ", "value UJ")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
+        updateStateJob(id_job, 3)
+        state = selectJobState(id_job)
         self.assertEqual(state, job_state.submitted)
     
     # Update with a unvalided state
     def UpdateJobWithUnvalidedState(self):
-        state_before = selectJobState(QueriesJobsUT.id_job)
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name UJWUS", "value UJWUS")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
+        state_before = selectJobState(id_job)
         try:
-            updateStateJob(QueriesJobsUT.id_job, 66)
+            updateStateJob(id_job, 66)
             self.assertTrue(False)
         except Exception as e:
-            state_after = selectJobState(QueriesJobsUT.id_job)
+            state_after = selectJobState(id_job)
 
             self.assertEqual(state_before, state_after)
 
@@ -374,14 +409,26 @@ class UpdateJobState(TestManager):
 class DeleteJob(TestManager):
     # Delete a job
     def DeleteJob(self):
-        killJob(QueriesJobsUT.id_job)
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name DJ", "value DJ")
 
-        state = selectJobState(QueriesJobsUT.id_job)
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
+        killJob(id_job)
+
+        state = selectJobState(id_job)
 
         self.assertEqual(state, job_state.cancelled)
     
     # Delete a non existed job
     def DeleteNonExistedJob(self):
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name DNEJ", "value DNEJ")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
         killJob(0)
 
         state = selectJobState(0)
@@ -389,20 +436,24 @@ class DeleteJob(TestManager):
         self.assertEqual(state, None)
     
     # Update a terminated job
-    """
     def UpdateJobTerminated(self):
-        updateStateJob(QueriesJobsUT.id_job, 6)
-        state_before = selectJobState(QueriesJobsUT.id_job)
+        # Create a parameter
+        id_param = addParam(CreateJob.id_campaign, "name", "value")
+
+        ### Create a job
+        id_job = addJob(CreateJob.id_campaign, id_param)
+        
+        updateStateJob(id_job, 6)
+        state_before = selectJobState(id_job)
         self.assertEqual(state_before, job_state.terminated)
         
         try:
-            updateStateJob(QueriesJobsUT.id_job, 4)
+            updateStateJob(id_job, 4)
             self.assertTrue(False)
         except Exception as e:
-            state_after = selectJobState(QueriesJobsUT.id_job)
+            state_after = selectJobState(id_job)
 
             self.assertEqual(state_before, state_after)
-    """
 
 ## CAMPAIGN_PROPERTIES
 class QueriesCampaignPropertiesUT(TestManager):
