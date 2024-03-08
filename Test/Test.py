@@ -2,6 +2,7 @@ import os
 import sys
 from TestManager import TestManager
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("Test", ""))
 
 if __name__ == "__main__":

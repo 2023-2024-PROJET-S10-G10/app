@@ -5,6 +5,7 @@ from typing import Optional, List
 from datetime import datetime
 import sys, os
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/SQL", ""))
 
 from utils.sql import *
@@ -50,6 +51,7 @@ class job_state(enum.Enum):
     terminated = 6
     event = 7
     batch_waiting = 8
+    cancelled = 9
 
 class event_class(enum.Enum):
     cluster = 1
@@ -88,7 +90,7 @@ cluster_table = Table(
     Column("api_auth_header", String(255)),
     Column("api_chunk_size", Integer, default=0),
     Column("ssh_host", String(255)),
-    Column("batch", Enum(api)),   # p'tet mettre api.value
+    Column("batch", Enum(api)),
     Column("resource_unit", String(255), default="resource_id"),
     Column("power", Integer),
     Column("properties", String(255)),
@@ -125,7 +127,7 @@ campagnes = Table(
     Column("state", Enum(campaign_state), nullable=False, index=True),
     Column("type", String(255), nullable=False),
     Column("name", String(255)),
-    Column("submission_time", TIMESTAMP),   # manque p'tet la spécification time zone, pour tout les TIMESTAMP d'ailleurs, faire une manip au ctrl h
+    Column("submission_time", TIMESTAMP),
     Column("completion_time", TIMESTAMP),
     Column("nb_jobs", Integer),
     Column("jdl", Text),
@@ -145,7 +147,7 @@ campaign_properties = Table(
 parameters = Table(
     "parameters",
     metadata_obj,
-    Column("id", Integer, primary_key=True, autoincrement=True, index=True),    # devrait être un bigserial
+    Column("id", Integer, primary_key=True, autoincrement=True, index=True),
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("name", String(255)),
     Column("param", Text),
@@ -181,7 +183,7 @@ jobs = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False, index=True),
     Column("batch_id", Integer, index=True),
-    Column("cluster_id", Integer, index=True),     #<- mettre depuis le jdl parser
+    Column("cluster_id", Integer, index=True),
     Column("collect_id", Integer),
     Column("state", Enum(job_state), nullable=False, index=True),
     Column("return_code", Integer),
@@ -288,29 +290,6 @@ taps = Table(
     CheckConstraint(f"state IN ({str(tap_state._member_names_)[1:-1]})", name="enum_state"),
 )
 
-class Base(DeclarativeBase):
-  pass
-
-class Cluster(Base):
-  __tablename__ = "clusters"
-
-  id: Mapped[int] = mapped_column(primary_key=True)
-  name: Mapped[str] = mapped_column(String(255))
-  api_url: Mapped[str] = mapped_column(String(255))
-  api_auth_type: Mapped[str] = mapped_column(Enum(auth_type), nullable=True)  # heu pas sûr que ce soit un mapped[str] lui
-  api_username: Mapped[str] = mapped_column(String(255), nullable=False)
-  api_password: Mapped[str] = mapped_column(String(255))
-
-  api_auth_header: Mapped[str] = mapped_column(String(255), nullable=True)
-  api_chunk_size: Mapped[int] = mapped_column(Integer)
-  ssh_host: Mapped[str] = mapped_column(String(255), nullable=True)
-  batch: Mapped[str] = mapped_column(Enum(api))                  # heu ici aussi
-  resource_unit: Mapped[str] = mapped_column(String(255), nullable=True)
-  power: Mapped[int] = mapped_column(Integer, nullable=True)
-  properties: Mapped[str] = mapped_column(String(255), nullable=True)
-  stress_factor: Mapped[float] = mapped_column(Float, nullable=True)
-  enabled: Mapped[bool] = mapped_column(Boolean)
-
 
 if __name__ == "__main__":
     metadata_obj.create_all(engine)
@@ -325,11 +304,3 @@ if __name__ == "__main__":
         conn.execute(clusterDahu)
         conn.commit()
 
-    """
-    stmt = insert(campagnes).values(grid_user="clément", state=campaign_state(2), submission_time=datetime.now(), type="test")
-
-    with engine.connect() as conn:
-        result = conn.execute(stmt)
-        #conn.execute(insert(cluster_table).values(name="Luke", api_url="/prout", api_username="dova", api_password="zer", batch=api(1), api_auth_type="pouet"))
-        conn.commit()
-    """

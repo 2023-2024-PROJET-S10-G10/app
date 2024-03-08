@@ -2,10 +2,10 @@ import sys
 import json
 import os
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/Parser", ""))
 
 from utils.jdl import nameCluster
-#from utils.jdl import jdlKeys
 from SQL.queries import *
 
 def get_json(json_file):

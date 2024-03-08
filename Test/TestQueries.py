@@ -1,6 +1,7 @@
 from TestManager import TestManager
 import sys
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/Test", ""))
 
 from SQL.queries import *
@@ -140,20 +141,52 @@ class UpdateCampaignState(TestManager):
             state_after = selectCampState(id_campaign)
             self.assertEqual(state_before, state_after)
 
-class DeleteCampaign(TestManager):
-    ### Cancel a campaign
-    def DeleteCampaign(self):
+    ### Update the state of a campaign already terminated
+    def UpdateCampaignAlreadyTerminated(self):
         ### Create
-        id_campaign = addCampaign("user DC", "name DC", "type DC", 11, "jdl DC")
+        id_campaign = addCampaign("user UCAT", "name UCAT", "type UCAT", 10, "jdl UCAT")
+        updateStateCampaign (id_campaign, 4)
+
+        state_before = selectCampState(id_campaign)
+        self.assertEqual(state_before, campaign_state.terminated)
+        
+        try:
+            updateStateCampaign (id_campaign, 3)
+            self.assertTrue(False)
+        except Exception as e:
+            state_after = selectCampState(id_campaign)
+            self.assertEqual(state_before, state_after)
+
+    ### Cancel a campaign already terminated
+    def CancelCampaignAlreadyTerminated(self):
+        ### Create
+        id_campaign = addCampaign("user CCAT", "name CCAT", "type CCAT", 10, "jdl CCAT")
+        updateStateCampaign (id_campaign, 4)
+
+        state_before = selectCampState(id_campaign)
+        self.assertEqual(state_before, campaign_state.terminated)
+        
+        try:
+            updateStateCampaign (id_campaign, 1)
+            self.assertTrue(False)
+        except Exception as e:
+            state_after = selectCampState(id_campaign)
+            self.assertEqual(state_before, state_after)
+
+class CancelCampaign(TestManager):
+    ### Cancel a campaign
+    def CancelCampaign(self):
+        ### Create
+        id_campaign = addCampaign("user CC", "name CC", "type CC", 11, "jdl CC")
 
         killCampaign(id_campaign)
         state = selectCampState(id_campaign)
         self.assertEqual(state, campaign_state.cancelled)
     
     ### Cancel a cancelled campaign
-    def DeleteCancelledCampaign(self):
+    def CancelCancelledCampaign(self):
         ### Create
-        id_campaign = addCampaign("user DCC", "name DCC", "type DCC", 12, "jdl DCC")
+        id_campaign = addCampaign("user CCC", "name CCC", "type CCC", 12, "jdl CCC")
         killCampaign(id_campaign)
         state = selectCampState(id_campaign)
         
@@ -166,7 +199,7 @@ class DeleteCampaign(TestManager):
         self.assertEqual(new_state, campaign_state.cancelled)
 
     ### Cancel a non existed campaign
-    def DeleteNonExistedCampaign(self):
+    def CancelNonExistedCampaign(self):
         killCampaign(0)
         state = selectCampState(0)
         self.assertEqual(state, None)
@@ -266,7 +299,7 @@ class DeleteParameter(TestManager):
         self.assertEqual(params, None)
 
 ## JOBS
-class QueriesJobsUT(TestManager):
+class QueriesJobsUT(TestManager):   # TODO: create job for each test
     # Create a campaign
     id_campaign = addCampaign("user", "name", 1, 1, "jdl")
     # Create a parameter
@@ -345,7 +378,7 @@ class DeleteJob(TestManager):
 
         state = selectJobState(QueriesJobsUT.id_job)
 
-        self.assertEqual(state, job_state.event)
+        self.assertEqual(state, job_state.cancelled)
     
     # Delete a non existed job
     def DeleteNonExistedJob(self):
@@ -354,6 +387,22 @@ class DeleteJob(TestManager):
         state = selectJobState(0)
 
         self.assertEqual(state, None)
+    
+    # Update a terminated job
+    """
+    def UpdateJobTerminated(self):
+        updateStateJob(QueriesJobsUT.id_job, 6)
+        state_before = selectJobState(QueriesJobsUT.id_job)
+        self.assertEqual(state_before, job_state.terminated)
+        
+        try:
+            updateStateJob(QueriesJobsUT.id_job, 4)
+            self.assertTrue(False)
+        except Exception as e:
+            state_after = selectJobState(QueriesJobsUT.id_job)
+
+            self.assertEqual(state_before, state_after)
+    """
 
 ## CAMPAIGN_PROPERTIES
 class QueriesCampaignPropertiesUT(TestManager):
