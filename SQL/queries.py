@@ -3,6 +3,7 @@ from sqlalchemy import *
 from datetime import datetime
 import sys
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/SQL", ""))
 
 from SQL.Config_BDD import *
@@ -18,7 +19,6 @@ def executeQueryReturn (query):
         connect.commit()
 
         result = res.scalar()
-        #results_as_dict = res.mappings().all()
     print("executeQueryReturn:", result)
     return result
 
@@ -29,7 +29,9 @@ def deleteCampaign (id):
     executeQuery(deleteCampaign)
 
 def killCampaign (id):
-    killCampaign = update(campagnes).where(campagnes.c.id == id).values(state = campaign_state(1)) # should be contrained and not be updated
+    state = selectCampState(id)
+
+    killCampaign = update(campagnes).where(campagnes.c.id == id, campagnes.c.state != campaign_state(4)).values(state = campaign_state(1))
     executeQuery(killCampaign)
 
 def addCampaign (grid_user, name, type, nbjobs, jdl):
@@ -41,11 +43,8 @@ def addCampaign (grid_user, name, type, nbjobs, jdl):
     executeQuery(addCampaign)
     return selectCampaign(grid_user, name, type, nbjobs, jdl, submission_time)
 
-def updateStateCampaign (id, state):    #TODO: add contraints
-    previous_state = selectCampState(id)
-    if previous_state == 1:
-        raise ValueError("The campaign is already killed.")
-    updateCampaign = update(campagnes).where(campagnes.c.id == id).values(state = campaign_state(state))
+def updateStateCampaign (id, state):
+    updateCampaign = update(campagnes).where(campagnes.c.id == id, campagnes.c.state != campaign_state(1), campagnes.c.state != campaign_state(4)).values(state = campaign_state(state))
     executeQuery(updateCampaign)
 
 def selectCampaign (grid_user, name, type, nbjobs, jdl, submission_time):
@@ -200,7 +199,7 @@ def deleteJob(id):
     executeQuery(killJob)
 
 def killJob (id):
-    killJob = update(jobs).where(jobs.c.id == id).values(state = job_state(7))
+    killJob = update(jobs).where(jobs.c.id == id, jobs.c.state != job_state(6)).values(state = job_state(9))
     executeQuery(killJob)
 
 def addJob (campaign_id, param_id):
@@ -218,11 +217,11 @@ def addJob (campaign_id, param_id):
     executeQuery(addJob)
     return selectJob(campaign_id, param_id)
 
-def updateStateJob (id, state):    #TODO: add contraints
+def updateStateJob (id, state):
     if id <= 0:
         raise ValueError("The id cannot be negative.")
     
-    updateJob = update(jobs).where(jobs.c.id == id).values(state = job_state(state))
+    updateJob = update(jobs).where(jobs.c.id == id, jobs.c.state != job_state(6), jobs.c.state != job_state(9)).values(state = job_state(state))
     executeQuery(updateJob)
 
 def selectJob (campaign_id, param_id):
@@ -333,12 +332,6 @@ def selectBagOfTaskParam (id):
     selectBagOfTaskParam = select(bag_of_tasks.c.param_id).where(bag_of_tasks.c.id == id)
     return executeQueryReturn (selectBagOfTaskParam)
 
-"""
-def deleteBagOfTask (id):
-    killBagOfTask = delete(bag_of_tasks).where(bag_of_tasks.c.id == id)
-    executeQuery(killBagOfTask)
-"""
-
 ## USER MAPPING
 
 def addUsersMapping (grid_login, cluster_login, cluster_id):
@@ -367,9 +360,3 @@ def selectUsersMapping (grid_login, cluster_login, cluster_id):
 ## TASKS AFFINITY
 
 ## TAPS
-
-
-if __name__ == "__main__":
-    killCampaign(2)
-    #addJob(1, "job1", "param1")
-

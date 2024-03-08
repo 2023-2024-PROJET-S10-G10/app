@@ -1,6 +1,7 @@
 from TestManager import TestManager
 import sys
 
+# Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/Test", ""))
 
 from Parser.jdl_parser import *
@@ -11,7 +12,7 @@ prefix = "JdlFiles/"
 ## NO CLUSTER USED + JDL FILE
 class NoClusterJdlUT(TestManager):
     
-    def test_getCampaignName(self):
+    def getCampaignName(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
@@ -19,21 +20,21 @@ class NoClusterJdlUT(TestManager):
         campaign_name = getCampaignName(jdl)
         self.assertEqual(campaign_name, "test_no_cluster")
     
-    def test_getJobType(self):
+    def getJobType(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getJobType(jdl), "normal")
     
-    def test_getParams(self):
+    def getParams(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getParams(jdl), ["test-prefect true", "titi true", "tata false", "toto false", "tata true", "titi false", "toto true"])
 
-    def test_getProjectName(self):
+    def getProjectName(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
@@ -54,14 +55,14 @@ class NoClusterJdlUT(TestManager):
         except Exception as e:
             self.assertTrue(True)
     
-    def test_getNbJobs(self):
+    def getNbJobs(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getNbJobs(jdl), 7)
     
-    def test_getClusters(self):
+    def getClusters(self):
         # import jdl
         jdl_file = prefix + "testNoCluster.jdl"
         jdl = get_json(jdl_file)
@@ -70,23 +71,22 @@ class NoClusterJdlUT(TestManager):
 
 
 ## ONE CLUSTER USED + ONE PARAMETER + JDL FILE
-#class OneParameterJdlUT(TestManager):
-class OneClusterJdlUT(TestManager):
+class OneClusterOneParameterJdlUT(TestManager):
 
-    def test_getCampaignName(self):
+    def getCampaignName(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
         campaign_name = getCampaignName(jdl)
         self.assertEqual(campaign_name, "test_one_param_one_cluster")
     
-    def test_getJobType(self):
+    def getJobType(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getJobType(jdl), "desktop_computing")
     
-    def test_getParams(self):
+    def getParams(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
@@ -94,7 +94,7 @@ class OneClusterJdlUT(TestManager):
 
         self.assertEqual(params, ["toto false"])
     
-    def test_getProjectName(self):
+    def getProjectName(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
@@ -105,13 +105,13 @@ class OneClusterJdlUT(TestManager):
 
         self.assertEqual(name_project_luke, "prefect_or_not")
     
-    def test_getNbJobs(self):
+    def getNbJobs(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getNbJobs(jdl), 1)
 
-    def test_getClusters(self):
+    def getClusters(self):
         jdl_file = prefix + "test1.jdl"
         jdl = get_json(jdl_file)
 
@@ -120,26 +120,26 @@ class OneClusterJdlUT(TestManager):
 ## ONE CLUSTER USED + JSON FILE
 class OneClusterJdlUT(TestManager):
 
-    def test_getCampaignName(self):
+    def getCampaignName(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
         campaign_name = getCampaignName(jdl)
         self.assertEqual(campaign_name, "test_one_param_one_cluster")
     
-    def test_getJobType(self):
+    def getJobType(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getJobType(jdl), "desktop_computing")
     
-    def test_getParams(self):
+    def getParams(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getParams(jdl), ["toto false"])
     
-    def test_getProjectName(self):
+    def getProjectName(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
@@ -150,13 +150,13 @@ class OneClusterJdlUT(TestManager):
 
         self.assertEqual(name_project_luke, "prefect_or_not")
     
-    def test_getNbJobs(self):
+    def getNbJobs(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getNbJobs(jdl), 1)
 
-    def test_getClusters(self):
+    def getClusters(self):
         jdl_file = prefix + "test1.json"
         jdl = get_json(jdl_file)
 
@@ -164,29 +164,28 @@ class OneClusterJdlUT(TestManager):
 
 
 ## SEVERAL CLUSTER USED + SEVERAL PARAMETERS + JSON FILE
-#class SeveralParameterJdlUT(TestManager):
-class SeveralClusterJdlUT(TestManager):
+class SeveralClusterSeveralParameterJdlUT(TestManager):
 
-    def test_getCampaignName(self):
+    def getCampaignName(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
         campaign_name = getCampaignName(jdl)
         self.assertEqual(campaign_name, "test_several_params_several_clusters")
 
-    def test_getJobType(self):
+    def getJobType(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getJobType(jdl), "normal")
     
-    def test_getParams(self):
+    def getParams(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getParams(jdl), ["test-prefect true", "titi true", "tata false", "toto false", "tata true", "titi false", "toto true"])
     
-    def test_getProjectName(self):
+    def getProjectName(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
@@ -200,13 +199,13 @@ class SeveralClusterJdlUT(TestManager):
         self.assertEqual(name_project_luke, "prefect_or_not")
         self.assertEqual(name_project_dahu, "prefect")
 
-    def test_getNbJobs(self):
+    def getNbJobs(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getNbJobs(jdl), 7)
     
-    def test_getClusters(self):
+    def getClusters(self):
         jdl_file = prefix + "test2.json"
         jdl = get_json(jdl_file)
 
@@ -216,26 +215,26 @@ class SeveralClusterJdlUT(TestManager):
 ## NO PARAMETER + JSON FILE
 class NoParameterJdlUT(TestManager):
 
-    def test_getCampaignName(self):
+    def getCampaignName(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
         campaign_name = getCampaignName(jdl)
         self.assertEqual(campaign_name, "test_no_param")
     
-    def test_getJobType(self):
+    def getJobType(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getJobType(jdl), "normal")
     
-    def test_getParams(self):
+    def getParams(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getParams(jdl), [])
     
-    def test_getProjectName(self):
+    def getProjectName(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
@@ -249,13 +248,13 @@ class NoParameterJdlUT(TestManager):
         self.assertEqual(name_project_luke, "prefect_or_not")
         self.assertEqual(name_project_dahu, "prefect")
     
-    def test_getNbJobs(self):
+    def getNbJobs(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
         self.assertEqual(getNbJobs(jdl), 0)
     
-    def test_getClusters(self):
+    def getClusters(self):
         jdl_file = prefix + "testNoParam.json"
         jdl = get_json(jdl_file)
 
