@@ -42,7 +42,7 @@ def executeQueryReturn(query):
     return result
 
 
-def executeQueryReturnAll(query):
+def executeQueryReturnList(query):
     with engine.connect() as connect:
         res = connect.execute(query)
         connect.commit()
@@ -120,8 +120,19 @@ def selectCampaign(grid_user, name, type, nbjobs, jdl, submission_time):
     )
     return executeQueryReturn(selectCampaign)
 
+def showCampaign (id):
+    showCampaign = select(campagnes.c.grid_user, campagnes.c.state, campagnes.c.type, campagnes.c.name, campagnes.c.submission_time, campagnes.c.completion_time, campagnes.c.nb_jobs, campagnes.c.jdl).where(campagnes.c.id == id)
+    return executeQueryReturnList(showCampaign)
 
-def selectCampJDL(id):
+def selectCampaignsFromUser (username):
+    selectCampaignsFromUser = select(campagnes.c.id, campagnes.c.name).where(campagnes.c.grid_user == username)
+    return executeQueryReturnList(selectCampaignsFromUser)
+
+def selectOpenCampaignsFromUser (username):
+    selectOpenCampaignsFromUser = select(campagnes.c.id, campagnes.c.name).where(campagnes.c.grid_user == username, campagnes.c.state != campaign_state.cancelled, campagnes.c.state != campaign_state.terminated)
+    return executeQueryReturnList(selectOpenCampaignsFromUser)
+
+def selectCampJDL (id):
     selectCampJDL = select(campagnes.c.jdl).where(campagnes.c.id == id)
     return executeQueryReturn(selectCampJDL)
 
@@ -319,6 +330,14 @@ def selectEventGlobal(id):
     return executeQueryReturn(selectEvent)
 
 
+def selectOpenEventsFromCampaign(id_campaign):
+    selectEvents = select(events.c.id, events.c.code, events.c.checked, events.c.date_update).where(events.c.campaign_id == id_campaign, events.c.state == event_state.open)
+    return executeQueryReturnList(selectEvents)
+
+def selectOpenEvents():
+    selectEvents = select(events.c.id, events.c.code, events.c.checked, events.c.date_update).where(events.c.state == event_state.open)
+    return executeQueryReturnList(selectEvents)
+
 def closeEvent(id):
     date_closed = datetime.now()
     closeEvent = (
@@ -378,7 +397,7 @@ def selectCampPropValue(id):
 
 def getClusters():
     getClusters = select(cluster_table.c.id, cluster_table.c.name)
-    return executeQueryReturnAll(getClusters)
+    return executeQueryReturnList(getClusters)
 
 
 def selectCluster(name):

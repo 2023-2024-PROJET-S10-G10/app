@@ -204,6 +204,41 @@ class CancelCampaign(TestManager):
         state = selectCampState(0)
         self.assertEqual(state, None)
 
+class SelectCampaign(TestManager):
+
+    def showCampaign(self):
+        id_camp = addCampaign("user", "name", "type", 5, "jdl")
+
+        campaign = showCampaign(id_camp)
+
+        self.assertEqual(campaign[0][0], "user")
+        self.assertEqual(campaign[0][1], campaign_state.in_treatment)
+        self.assertEqual(campaign[0][2], "type")
+        self.assertEqual(campaign[0][3], "name")
+        self.assertEqual(campaign[0][5], None)
+        self.assertEqual(campaign[0][6], 5)
+        self.assertEqual(campaign[0][7], "jdl")
+
+    def selectCampaignsFromUser(self):
+        id_camp1 = addCampaign("user1", "name", "type", 5, "jdl")
+        id_camp2 = addCampaign("user1", "name", "type", 5, "jdl")
+        id_camp3 = addCampaign("user1", "name", "type", 5, "jdl")
+
+        campaigns = selectCampaignsFromUser("user1")
+
+        self.assertEqual(campaigns[0][0], id_camp1)
+        self.assertEqual(campaigns[1][0], id_camp2)
+        self.assertEqual(campaigns[2][0], id_camp3)
+
+    def selectOpenCampaignsFromUser(self):
+        id_camp1 = addCampaign("user2", "name", "type", 5, "jdl")
+        id_camp2 = addCampaign("user2", "name", "type", 5, "jdl")
+        id_camp3 = addCampaign("user2", "name", "type", 5, "jdl")
+        killCampaign(id_camp2)
+
+        campaigns = selectOpenCampaignsFromUser("user2")
+
+        self.assertTrue(len(campaigns) == 2)
 
 ## PARAMETERS
 class CreateParameter(TestManager):
@@ -540,6 +575,7 @@ class QueriesEventsUT(TestManager):
     ### Create event for a campaign
     def CreateEventsForCampaign(self):
         id_event_campaign = addEvent(3, QueriesEventsUT.id_campaign, "code campagne", "message campagne", False)
+        GetEvents.id_campaign_e = id_event_campaign
 
         state_campaign = selectEventState(id_event_campaign)
         code_campaign = selectEventCode(id_event_campaign)
@@ -561,6 +597,7 @@ class QueriesEventsUT(TestManager):
     ### Create event for a job
     def CreateEventsForJob(self):
         id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        GetEvents.id_job_e = id_event_job
 
         state_job = selectEventState(id_event_job)
         code_job = selectEventCode(id_event_job)
@@ -579,6 +616,28 @@ class QueriesEventsUT(TestManager):
         self.assertEqual(notified_job, False)
         self.assertNotEqual(id_event_job, None)
 
+### Get events
+
+class GetEvents(TestManager):
+    # ids of events
+    id_campaign_e = 0
+    id_job_e = 0
+
+    ### get open events related to a campaign
+    def GetEventsFromCampaign(self):
+        events = selectOpenEventsFromCampaign(QueriesEventsUT.id_campaign)
+
+        self.assertEqual(events[0][0], GetEvents.id_campaign_e)
+        self.assertEqual(events[0][1], "code campagne")
+        self.assertEqual(events[0][2], None)
+        self.assertEqual(events[1][0], GetEvents.id_job_e)
+        self.assertEqual(events[1][1], "code job")
+        self.assertEqual(events[1][2], None)
+
+    def GetOpenEvents(self):
+        events = selectOpenEvents()
+
+        self.assertTrue(len(events)>3)
 
 ### UpdateParent
 class UpdateEventParent(TestManager):
