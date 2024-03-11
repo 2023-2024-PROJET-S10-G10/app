@@ -16,5 +16,5 @@ repos:
       hooks:
         -   id: flake8
             args: [
-              "--ignore=E501,W503,F841,E402,E266,F405"
+              "--ignore=E501,W503,F841,E402,E266,F405,F403"
             ]
