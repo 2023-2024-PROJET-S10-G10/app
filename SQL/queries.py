@@ -452,6 +452,13 @@ def selectCluster(name):
     return executeQueryReturn(selectCluster)
 
 
+def selectClusterById(id):
+    selectClusterId = select(cluster_table.columns).where(
+        cluster_table.c.id == int(id)
+    )
+    return executeQueryReturnAll(selectClusterId)
+
+
 ### JOBS
 
 

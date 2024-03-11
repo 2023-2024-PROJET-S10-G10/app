@@ -4,7 +4,7 @@ import uvicorn
 
 sys.path.append(sys.path[0].replace("/API/CiGri", ""))
 from fastapi import FastAPI, HTTPException
-from SQL.queries import getClusters
+from SQL.queries import getClusters, selectClusterById
 
 app = FastAPI()
 
@@ -35,7 +35,16 @@ async def clusters():
 # Récupère les informations d'un cluster en particulier
 @app.get("/clusters/{clusterId}")
 async def cluster(clusterId: int):
-    raise HTTPException(status_code=404, detail="Not Yet Implemented")
+    items = selectClusterById(clusterId)[0]
+    items |= {
+        "links": [
+            {"rel": "self", "href": f"/clusters/{clusterId}"},
+            {"rel": "parent", "href": "/clusters"},
+        ],
+        "blacklisted": "False",
+        "under_stress": "False",
+    }
+    return items
 
 
 # Liste toutes les campagnes en cours
