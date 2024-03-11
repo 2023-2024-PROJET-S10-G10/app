@@ -10,6 +10,7 @@ python = "3.10.12"
 SQLAlchemy = "2.0"
 fastapi = "^0.109.0"
 rich-click = "^1.7.3"
+uvicorn = {extras = ["standard"], version = "^0.28.0"}
 
 [tool.poetry.dev-dependencies]
 black = "*"
