@@ -12,7 +12,7 @@ from utils.sql import *
 
 metadata_obj = MetaData()
 
-if sys.argv != 2:
+if len(sys.argv) != 2:
     print("Usage:   python Config_BDD.py <path_DB> (default: SQL in /app)")
     print("Example: python Config_BDD.py SQL")
     path = "SQL/"

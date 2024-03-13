@@ -8,10 +8,10 @@ Ceci est le dépôt GitHub du projet S10 du Groupe 10 dédié à l'application.
 
 ## Comment lancer CiGri (API et BDD)
 
-Exécuter le programme `Initiator/initiator.py` dans `/app` avec, en argument, le chemin dans lequel vous voulez retrouver et créer votre base de données. Si vous ne renseignez pas le chemin, par défaut, ça sera la base de données dans `/app/SQL`.
+Exécuter le programme `Initiator/initiator.py` dans `/app`.
 
 exemple:
 
 ```bash
-python Initiator/initiator.py SQL
+python Initiator/initiator.py
 ```
