@@ -94,7 +94,7 @@ def gridclusters(infos, more_infos, usage, bars, client):
         prompt += str(cluster["id"]) + ": " + cluster["name"]
 
         if infos:
-            _, content = client.get("/clusters/" + cluster["id"])
+            _, content = client.get(f"/clusters/{cluster['id']}")
             cluster_detail = json.loads(content)
 
             if more_infos:
@@ -104,12 +104,7 @@ def gridclusters(infos, more_infos, usage, bars, client):
                             "\n\t" + key + ": " + str(cluster_detail[key])
                         )
             else:
-                prompt += (
-                    ", "
-                    + cluster_detail["ssh_host"]
-                    + " (stress:"
-                    + cluster_detail["stress_factor"]
-                )
+                prompt += f", {cluster_detail['ssh_host']} (stress: {cluster_detail['stress_factor']}"
                 if cluster_detail["blacklisted"]:
                     prompt += ", BLACKLISTED"
                 if cluster_detail["under_stress"]:
