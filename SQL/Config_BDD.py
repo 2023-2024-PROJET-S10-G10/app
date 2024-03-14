@@ -18,8 +18,16 @@ if len(sys.argv) != 2:
     path = "SQL/"
 else:
     path = sys.argv[1]
-    if not path.endswith("/"):
-        path += "/"
+    if path == "SQL" or path == "SQL/":
+        path = "SQL/"
+    else:
+        path_local = "../" + path
+        if os.path.isdir(path_local):
+            print(f"The path `{path_local}` is not valid.")
+            sys.exit(1)
+        path = sys.argv[1]
+        if not path.endswith("/"):
+            path += "/"
     
 engine = create_engine(getPath(path), echo=True)
 
