@@ -5,6 +5,9 @@ class FAP:
     def __init__(self):
         self.elements = []
 
+    def empty(self):
+        return len(self.elements) == 0
+
     def append(self, value, priority=0):
         self.elements.append(FAP.FAPElement(value, priority))
 
