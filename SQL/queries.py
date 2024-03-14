@@ -59,7 +59,23 @@ def executeQueryReturnList(query):
     return result
 
 
-# CAMPAIGNS
+def executeQueryReturnAll(query):
+    with engine.connect() as connect:
+        res = connect.execute(query)
+        connect.commit()
+        queryRes = res.all()
+        result = []
+        for elt in queryRes:
+            keys = enumerate(res.keys())
+            obj = {}
+            for i, key in keys:
+                obj[key] = elt[i]
+            result.append(obj)
+    print("executeQueryReturn:", result)
+    return result
+
+
+### CAMPAIGNS
 
 
 def deleteCampaign(id):
@@ -120,19 +136,40 @@ def selectCampaign(grid_user, name, type, nbjobs, jdl, submission_time):
     )
     return executeQueryReturn(selectCampaign)
 
-def showCampaign (id):
-    showCampaign = select(campagnes.c.grid_user, campagnes.c.state, campagnes.c.type, campagnes.c.name, campagnes.c.submission_time, campagnes.c.completion_time, campagnes.c.nb_jobs, campagnes.c.jdl).where(campagnes.c.id == id)
+
+def showCampaign(id):
+    showCampaign = select(
+        campagnes.c.grid_user,
+        campagnes.c.state,
+        campagnes.c.type,
+        campagnes.c.name,
+        campagnes.c.submission_time,
+        campagnes.c.completion_time,
+        campagnes.c.nb_jobs,
+        campagnes.c.jdl,
+    ).where(campagnes.c.id == id)
     return executeQueryReturnList(showCampaign)
 
-def selectCampaignsFromUser (username):
-    selectCampaignsFromUser = select(campagnes.c.id, campagnes.c.name).where(campagnes.c.grid_user == username)
+
+def selectCampaignsFromUser(username):
+    selectCampaignsFromUser = select(campagnes.c.id, campagnes.c.name).where(
+        campagnes.c.grid_user == username
+    )
     return executeQueryReturnList(selectCampaignsFromUser)
 
-def selectOpenCampaignsFromUser (username):
-    selectOpenCampaignsFromUser = select(campagnes.c.id, campagnes.c.name).where(campagnes.c.grid_user == username, campagnes.c.state != campaign_state.cancelled, campagnes.c.state != campaign_state.terminated)
+
+def selectOpenCampaignsFromUser(username):
+    selectOpenCampaignsFromUser = select(
+        campagnes.c.id, campagnes.c.name
+    ).where(
+        campagnes.c.grid_user == username,
+        campagnes.c.state != campaign_state.cancelled,
+        campagnes.c.state != campaign_state.terminated,
+    )
     return executeQueryReturnList(selectOpenCampaignsFromUser)
 
-def selectCampJDL (id):
+
+def selectCampJDL(id):
     selectCampJDL = select(campagnes.c.jdl).where(campagnes.c.id == id)
     return executeQueryReturn(selectCampJDL)
 
@@ -331,12 +368,20 @@ def selectEventGlobal(id):
 
 
 def selectOpenEventsFromCampaign(id_campaign):
-    selectEvents = select(events.c.id, events.c.code, events.c.checked, events.c.date_update).where(events.c.campaign_id == id_campaign, events.c.state == event_state.open)
+    selectEvents = select(
+        events.c.id, events.c.code, events.c.checked, events.c.date_update
+    ).where(
+        events.c.campaign_id == id_campaign, events.c.state == event_state.open
+    )
     return executeQueryReturnList(selectEvents)
 
+
 def selectOpenEvents():
-    selectEvents = select(events.c.id, events.c.code, events.c.checked, events.c.date_update).where(events.c.state == event_state.open)
+    selectEvents = select(
+        events.c.id, events.c.code, events.c.checked, events.c.date_update
+    ).where(events.c.state == event_state.open)
     return executeQueryReturnList(selectEvents)
+
 
 def closeEvent(id):
     date_closed = datetime.now()
