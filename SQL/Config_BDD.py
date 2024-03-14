@@ -26,8 +26,10 @@ else:
         path = sys.argv[1]
         if not path.endswith("/"):
             path += "/"
-    
+
+print(path)
 engine = create_engine(getPath(path), echo=True)
+
 
 def initializeCluster():
     metadata_obj.create_all(engine)
