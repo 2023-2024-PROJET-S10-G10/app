@@ -6,6 +6,12 @@ from TestManager import TestManager
 sys.path.append(sys.path[0].replace("Test", ""))
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python Test.py <debuglevel>")
+        exit(1)
+    
+    nargs = len(sys.argv)
+    debuglevel = int(sys.argv[1])
     files = [
         file
         for file in os.listdir(os.getcwd())
@@ -22,5 +28,5 @@ if __name__ == "__main__":
         module_name = file.replace(".py", "")
         __import__(module_name)
 
-    passed = TestManager(int(sys.argv[1]) if len(sys.argv) >= 2 else 0).start()
+    passed = TestManager(debuglevel if nargs >= 2 else 0).start()
     exit(0 if passed else 1)
