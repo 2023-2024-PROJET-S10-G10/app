@@ -239,13 +239,13 @@ class SelectCampaign(TestManager):
 
         campaign = showCampaign(id_camp)
 
-        self.assertEqual(campaign[0][0], "user")
-        self.assertEqual(campaign[0][1], campaign_state.in_treatment)
-        self.assertEqual(campaign[0][2], "type")
-        self.assertEqual(campaign[0][3], "name")
-        self.assertEqual(campaign[0][5], None)
-        self.assertEqual(campaign[0][6], 5)
-        self.assertEqual(campaign[0][7], "jdl")
+        self.assertEqual(campaign[0]["grid_user"], "user")
+        self.assertEqual(campaign[0]["state"], campaign_state.in_treatment)
+        self.assertEqual(campaign[0]["type"], "type")
+        self.assertEqual(campaign[0]["name"], "name")
+        self.assertEqual(campaign[0]["completion_time"], None)
+        self.assertEqual(campaign[0]["nb_jobs"], 5)
+        self.assertEqual(campaign[0]["jdl"], "jdl")
 
     def selectCampaignsFromUser(self):
         id_camp1 = addCampaign("user1", "name", "type", 5, "jdl")
@@ -254,9 +254,9 @@ class SelectCampaign(TestManager):
 
         campaigns = selectCampaignsFromUser("user1")
 
-        self.assertEqual(campaigns[0][0], id_camp1)
-        self.assertEqual(campaigns[1][0], id_camp2)
-        self.assertEqual(campaigns[2][0], id_camp3)
+        self.assertEqual(campaigns[0]["id"], id_camp1)
+        self.assertEqual(campaigns[1]["id"], id_camp2)
+        self.assertEqual(campaigns[2]["id"], id_camp3)
 
     def selectOpenCampaignsFromUser(self):
         id_camp1 = addCampaign("user2", "name", "type", 5, "jdl")
@@ -704,12 +704,12 @@ class GetEvents(TestManager):
     def GetEventsFromCampaign(self):
         events = selectOpenEventsFromCampaign(QueriesEventsUT.id_campaign)
 
-        self.assertEqual(events[0][0], GetEvents.id_campaign_e)
-        self.assertEqual(events[0][1], "code campagne")
-        self.assertEqual(events[0][2], None)
-        self.assertEqual(events[1][0], GetEvents.id_job_e)
-        self.assertEqual(events[1][1], "code job")
-        self.assertEqual(events[1][2], None)
+        self.assertEqual(events[0]["id"], GetEvents.id_campaign_e)
+        self.assertEqual(events[0]["code"], "code campagne")
+        self.assertEqual(events[0]["checked"], None)
+        self.assertEqual(events[1]["id"], GetEvents.id_job_e)
+        self.assertEqual(events[1]["code"], "code job")
+        self.assertEqual(events[1]["checked"], None)
 
     def GetOpenEvents(self):
         events = selectOpenEvents()
