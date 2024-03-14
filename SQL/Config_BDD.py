@@ -1,9 +1,7 @@
 import enum
 from sqlalchemy import *
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from typing import Optional, List
-from datetime import datetime
-import sys, os
+import sys
+import os
 
 # Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/SQL", ""))
@@ -33,20 +31,36 @@ engine = create_engine(getPath(path), echo=True)
 
 def initializeCluster():
     metadata_obj.create_all(engine)
-    
-    #TODO: Replace dummy values
-    clusterLuke = insert(cluster_table).values(name="luke", api_url="/foo", api_username="dova", api_password="zer", batch=api(1), api_auth_type=auth_type(1))
-    clusterDahu = insert(cluster_table).values(name="dahu", api_url="/bar", api_username="air", api_password="zerzer", batch=api(2), api_auth_type=auth_type(1))
-    
+
+    # TODO: Replace dummy values
+    clusterLuke = insert(cluster_table).values(
+        name="luke",
+        api_url="/foo",
+        api_username="dova",
+        api_password="zer",
+        batch=api(1),
+        api_auth_type=auth_type(1),
+    )
+    clusterDahu = insert(cluster_table).values(
+        name="dahu",
+        api_url="/bar",
+        api_username="air",
+        api_password="zerzer",
+        batch=api(2),
+        api_auth_type=auth_type(1),
+    )
+
     with engine.connect() as conn:
         conn.execute(clusterLuke)
         conn.commit()
         conn.execute(clusterDahu)
         conn.commit()
 
+
 class api(enum.Enum):
     oar2_5 = 1
     g5k = 2
+
 
 class auth_type(enum.Enum):
     none = 1
@@ -54,11 +68,13 @@ class auth_type(enum.Enum):
     cert = 3
     JWT = 4
 
+
 class campaign_state(enum.Enum):
     cancelled = 1
     in_treatment = 2
     paused = 3
     terminated = 4
+
 
 class job_state(enum.Enum):
     to_launch = 1
@@ -71,6 +87,7 @@ class job_state(enum.Enum):
     batch_waiting = 8
     cancelled = 9
 
+
 class event_class(enum.Enum):
     cluster = 1
     job = 2
@@ -78,23 +95,28 @@ class event_class(enum.Enum):
     notify = 4
     log = 5
 
+
 class event_state(enum.Enum):
     open = 1
     closed = 2
+
 
 class checkbox(enum.Enum):
     yes = 1
     no = 2
 
+
 class tap_state(enum.Enum):
     open = 1
     closed = 2
+
 
 class notifications(enum.Enum):
     mail = 1
     xmpp = 2
     log = 3
     irc = 4
+
 
 cluster_table = Table(
     "clusters",
@@ -114,8 +136,13 @@ cluster_table = Table(
     Column("properties", String(255)),
     Column("stress_factor", Float, default=0),
     Column("enabled", Boolean, default=true()),
-    CheckConstraint(f"api_auth_type IN ({str(auth_type._member_names_)[1:-1]})", name="enum_auth"),
-    CheckConstraint(f"batch IN ({str(api._member_names_)[1:-1]})", name="enum_batch"),
+    CheckConstraint(
+        f"api_auth_type IN ({str(auth_type._member_names_)[1:-1]})",
+        name="enum_auth",
+    ),
+    CheckConstraint(
+        f"batch IN ({str(api._member_names_)[1:-1]})", name="enum_batch"
+    ),
 )
 
 authentification = Table(
@@ -125,7 +152,7 @@ authentification = Table(
     Column("grid_login", String(255), nullable=False),
     Column("cluster_id", Integer, nullable=False),
     Column("JWT", String(255), nullable=False),
-    UniqueConstraint('grid_login', 'cluster_id', name='UniqueJWTPerUser')
+    UniqueConstraint("grid_login", "cluster_id", name="UniqueJWTPerUser"),
 )
 
 users_mapping = Table(
@@ -134,7 +161,7 @@ users_mapping = Table(
     Column("id", Integer),
     Column("grid_login", String(255), primary_key=True),
     Column("cluster_login", String(255)),
-    Column("cluster_id", Integer)
+    Column("cluster_id", Integer),
 )
 
 campagnes = Table(
@@ -149,17 +176,22 @@ campagnes = Table(
     Column("completion_time", TIMESTAMP),
     Column("nb_jobs", Integer),
     Column("jdl", Text),
-    CheckConstraint(f"state IN ({str(campaign_state._member_names_)[1:-1]})", name="enum_state"),
+    CheckConstraint(
+        f"state IN ({str(campaign_state._member_names_)[1:-1]})",
+        name="enum_state",
+    ),
 )
 
 campaign_properties = Table(
     "campaign_properties",
     metadata_obj,
     Column("id", Integer, primary_key=True),
-    Column("cluster_id", Integer),   # if NULL, then it's a global
-    Column("campaign_id", Integer, nullable=False),     # Double index, je sais pas encore comment faire
+    Column("cluster_id", Integer),  # if NULL, then it's a global
+    Column(
+        "campaign_id", Integer, nullable=False
+    ),  # Double index, je sais pas encore comment faire
     Column("name", String(255), nullable=False),
-    Column("value", Text, nullable=False)
+    Column("value", Text, nullable=False),
 )
 
 parameters = Table(
@@ -169,7 +201,7 @@ parameters = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("name", String(255)),
     Column("param", Text),
-    UniqueConstraint('campaign_id', 'name', name='UniqueParamPerName')
+    UniqueConstraint("campaign_id", "name", name="UniqueParamPerName"),
 )
 
 bag_of_tasks = Table(
@@ -179,7 +211,7 @@ bag_of_tasks = Table(
     Column("campaign_id", Integer, nullable=False, index=True),
     Column("param_id", Integer, nullable=False),
     Column("priority", Integer, nullable=False, default=10),
-    UniqueConstraint('campaign_id', 'param_id', name='UniquePriorityPerParam')
+    UniqueConstraint("campaign_id", "param_id", name="UniquePriorityPerParam"),
 )
 
 jobs_to_launch = Table(
@@ -191,7 +223,7 @@ jobs_to_launch = Table(
     Column("tag", String(255)),
     Column("queuing_date", TIMESTAMP),
     Column("runner_options", Text),
-    Column("order_num", Integer, nullable=False, default=1)
+    Column("order_num", Integer, nullable=False, default=1),
 )
 
 jobs = Table(
@@ -213,14 +245,16 @@ jobs = Table(
     Column("remote_id", Integer),
     Column("tag", String(255), index=True),
     Column("runner_options", Text),
-    CheckConstraint(f"state IN ({str(job_state._member_names_)[1:-1]})", name="enum_state"),
+    CheckConstraint(
+        f"state IN ({str(job_state._member_names_)[1:-1]})", name="enum_state"
+    ),
 )
 
 events = Table(
     "events",
     metadata_obj,
     Column("id", Integer, primary_key=True, index=True),
-    Column("class_e", Enum(event_class),nullable=False, index=True),
+    Column("class_e", Enum(event_class), nullable=False, index=True),
     Column("code", String(32), nullable=False, index=True),
     Column("state", Enum(event_state), nullable=False, index=True),
     Column("job_id", Integer, index=True),
@@ -233,9 +267,18 @@ events = Table(
     Column("date_closed", TIMESTAMP),
     Column("date_update", TIMESTAMP),
     Column("message", Text),
-    CheckConstraint(f"state IN ({str(event_state._member_names_)[1:-1]})", name="enum_state"),
-    CheckConstraint(f"class_e IN ({str(event_class._member_names_)[1:-1]})", name="enum_class"),
-    CheckConstraint(f"checked IN ({str(checkbox._member_names_)[1:-1]})", name="enum_checkbox"),
+    CheckConstraint(
+        f"state IN ({str(event_state._member_names_)[1:-1]})",
+        name="enum_state",
+    ),
+    CheckConstraint(
+        f"class_e IN ({str(event_class._member_names_)[1:-1]})",
+        name="enum_class",
+    ),
+    CheckConstraint(
+        f"checked IN ({str(checkbox._member_names_)[1:-1]})",
+        name="enum_checkbox",
+    ),
 )
 
 queue_counts = Table(
@@ -251,7 +294,7 @@ admission_rules = Table(
     "admission_rules",
     metadata_obj,
     Column("id", Integer, nullable=False),
-    Column("code", Text)
+    Column("code", Text),
 )
 
 user_notifications = Table(
@@ -262,8 +305,13 @@ user_notifications = Table(
     Column("type", Enum(notifications)),
     Column("identity", String(255)),
     Column("severity", String(32)),
-    UniqueConstraint('grid_user','identity','type', name='UniqueUserNotification'),
-    CheckConstraint(f"type IN ({str(notifications._member_names_)[1:-1]})", name="enum_notification"),
+    UniqueConstraint(
+        "grid_user", "identity", "type", name="UniqueUserNotification"
+    ),
+    CheckConstraint(
+        f"type IN ({str(notifications._member_names_)[1:-1]})",
+        name="enum_notification",
+    ),
 )
 
 grid_usage = Table(
@@ -301,11 +349,13 @@ taps = Table(
     metadata_obj,
     Column("id", Integer, nullable=False, index=True),
     Column("cluster_id", Integer, nullable=False),
-    Column("campaign_id", Integer, nullable=False), # double index
+    Column("campaign_id", Integer, nullable=False),  # double index
     Column("state", Enum(tap_state), nullable=False, default=tap_state(1)),
     Column("rate", Integer, nullable=False),
     Column("close_date", TIMESTAMP),
-    CheckConstraint(f"state IN ({str(tap_state._member_names_)[1:-1]})", name="enum_state"),
+    CheckConstraint(
+        f"state IN ({str(tap_state._member_names_)[1:-1]})", name="enum_state"
+    ),
 )
 
 initializeCluster()
