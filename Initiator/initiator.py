@@ -44,6 +44,3 @@ if __name__ == "__main__":
 
     # launch CiGri's API
     launchAPI()
-else:
-    initializeDB()
-    launchAPI()
