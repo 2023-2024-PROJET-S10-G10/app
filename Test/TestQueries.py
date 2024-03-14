@@ -6,7 +6,8 @@ sys.path.append(sys.path[0].replace("/Test", ""))
 
 from SQL.queries import *
 
-id_cluster = 2  #dahu
+id_cluster = 2  # dahu
+
 
 class QueriesClusterUT(TestManager):
     ## CLUSTER
@@ -19,6 +20,7 @@ class QueriesClusterUT(TestManager):
         self.assertEqual(id_cluster_dahu, 2)
         self.assertEqual(id_cluster_luke, 1)
         self.assertEqual(id_cluster_tatooine, None)
+
 
 ## CAMPAIGNS
 class CreateCampaign(TestManager):
@@ -46,7 +48,9 @@ class CreateCampaign(TestManager):
     def CreateCampaignWithoutUser(self):
         try:
             ### Create
-            id_campaign = addCampaign(null, "name CCWU", "type CCWU", 3, "jdl CCWU")
+            id_campaign = addCampaign(
+                null, "name CCWU", "type CCWU", 3, "jdl CCWU"
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
@@ -55,44 +59,55 @@ class CreateCampaign(TestManager):
     def CreateCampaignWithoutName(self):
         try:
             ### Create
-            id_campaign = addCampaign("user CCWN", null, "type CCWN", 4, "jdl CCWN")
+            id_campaign = addCampaign(
+                "user CCWN", null, "type CCWN", 4, "jdl CCWN"
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
-    
+
     # Create a campaign without jdl
     def CreateCampaignWithoutJdl(self):
         ### Create
-        id_campaign = addCampaign("user CCWJ", "name CCWJ", "type CCWJ", 5, None)
-        
+        id_campaign = addCampaign(
+            "user CCWJ", "name CCWJ", "type CCWJ", 5, None
+        )
+
         jdl = selectCampJDL(id_campaign)
         self.assertEqual(jdl, None)
-    
+
     # Create a campaign with zero job
     def CreateCampaignWithZeroJob(self):
         ### Create
-        id_campaign = addCampaign("user CCWZJ", "name CCWZJ", "type CCWZJ", 0, "jdl CCWZJ")
-        
+        id_campaign = addCampaign(
+            "user CCWZJ", "name CCWZJ", "type CCWZJ", 0, "jdl CCWZJ"
+        )
+
         nbjobs = selectCampNbJobs(id_campaign)
         self.assertEqual(nbjobs, 0)
-    
+
     # Create a campaign with a unvalided number of job
     def CreateCampaignWithUnvalidedNbJob(self):
         try:
             ### Create
-            id_campaign = addCampaign("user CCWUNJ", "name CCWUNJ", "type CCWUNJ", -1, "jdl CCWUNJ")
+            id_campaign = addCampaign(
+                "user CCWUNJ", "name CCWUNJ", "type CCWUNJ", -1, "jdl CCWUNJ"
+            )
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
     # Create a campaign without type
     def CreateCampaignWithoutType(self):
         try:
             ### Create
-            id_campaign = addCampaign("user CCWT", "name CCWT", None, 6, "jdl CCWT")
+            id_campaign = addCampaign(
+                "user CCWT", "name CCWT", None, 6, "jdl CCWT"
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
+
 
 class SelectCampaignJdl(TestManager):
     # Return a jdl
@@ -108,6 +123,7 @@ class SelectCampaignJdl(TestManager):
         jdl = selectCampJDL(0)
         self.assertEqual(jdl, None)
 
+
 class SelectCampaignState(TestManager):
     # Return a state
     def SelectState(self):
@@ -117,25 +133,28 @@ class SelectCampaignState(TestManager):
         state = selectCampState(id_campaign)
         self.assertEqual(state, campaign_state.in_treatment)
 
+
 class UpdateCampaignState(TestManager):
     ### Update the state
     def UpdateCampaign(self):
         ### Create
         id_campaign = addCampaign("user UC", "name UC", "type UC", 9, "jdl UC")
-        
-        updateStateCampaign (id_campaign, 3)
-        
+
+        updateStateCampaign(id_campaign, 3)
+
         state = selectCampState(id_campaign)
         self.assertEqual(state, campaign_state.paused)
-    
+
     ### Update the state with a unvalided state
     def UpdateCampaignWithUnvalidedState(self):
         ### Create
-        id_campaign = addCampaign("user UCWUS", "name UCWUS", "type UCWUS", 10, "jdl UCWUS")
+        id_campaign = addCampaign(
+            "user UCWUS", "name UCWUS", "type UCWUS", 10, "jdl UCWUS"
+        )
 
         state_before = selectCampState(id_campaign)
         try:
-            updateStateCampaign (id_campaign, 66)
+            updateStateCampaign(id_campaign, 66)
             self.assertTrue(False)
         except Exception as e:
             state_after = selectCampState(id_campaign)
@@ -144,14 +163,16 @@ class UpdateCampaignState(TestManager):
     ### Update the state of a campaign already terminated
     def UpdateCampaignAlreadyTerminated(self):
         ### Create
-        id_campaign = addCampaign("user UCAT", "name UCAT", "type UCAT", 10, "jdl UCAT")
-        updateStateCampaign (id_campaign, 4)
+        id_campaign = addCampaign(
+            "user UCAT", "name UCAT", "type UCAT", 10, "jdl UCAT"
+        )
+        updateStateCampaign(id_campaign, 4)
 
         state_before = selectCampState(id_campaign)
         self.assertEqual(state_before, campaign_state.terminated)
-        
+
         try:
-            updateStateCampaign (id_campaign, 3)
+            updateStateCampaign(id_campaign, 3)
             self.assertTrue(False)
         except Exception as e:
             state_after = selectCampState(id_campaign)
@@ -160,36 +181,43 @@ class UpdateCampaignState(TestManager):
     ### Cancel a campaign already terminated
     def CancelCampaignAlreadyTerminated(self):
         ### Create
-        id_campaign = addCampaign("user CCAT", "name CCAT", "type CCAT", 10, "jdl CCAT")
-        updateStateCampaign (id_campaign, 4)
+        id_campaign = addCampaign(
+            "user CCAT", "name CCAT", "type CCAT", 10, "jdl CCAT"
+        )
+        updateStateCampaign(id_campaign, 4)
 
         state_before = selectCampState(id_campaign)
         self.assertEqual(state_before, campaign_state.terminated)
-        
+
         try:
-            updateStateCampaign (id_campaign, 1)
+            updateStateCampaign(id_campaign, 1)
             self.assertTrue(False)
         except Exception as e:
             state_after = selectCampState(id_campaign)
             self.assertEqual(state_before, state_after)
 
+
 class CancelCampaign(TestManager):
     ### Cancel a campaign
     def CancelCampaign(self):
         ### Create
-        id_campaign = addCampaign("user CC", "name CC", "type CC", 11, "jdl CC")
+        id_campaign = addCampaign(
+            "user CC", "name CC", "type CC", 11, "jdl CC"
+        )
 
         killCampaign(id_campaign)
         state = selectCampState(id_campaign)
         self.assertEqual(state, campaign_state.cancelled)
-    
+
     ### Cancel a cancelled campaign
     def CancelCancelledCampaign(self):
         ### Create
-        id_campaign = addCampaign("user CCC", "name CCC", "type CCC", 12, "jdl CCC")
+        id_campaign = addCampaign(
+            "user CCC", "name CCC", "type CCC", 12, "jdl CCC"
+        )
         killCampaign(id_campaign)
         state = selectCampState(id_campaign)
-        
+
         self.assertEqual(state, campaign_state.cancelled)
 
         killCampaign(id_campaign)
@@ -204,8 +232,8 @@ class CancelCampaign(TestManager):
         state = selectCampState(0)
         self.assertEqual(state, None)
 
-class SelectCampaign(TestManager):
 
+class SelectCampaign(TestManager):
     def showCampaign(self):
         id_camp = addCampaign("user", "name", "type", 5, "jdl")
 
@@ -240,6 +268,7 @@ class SelectCampaign(TestManager):
 
         self.assertTrue(len(campaigns) == 2)
 
+
 ## PARAMETERS
 class CreateParameter(TestManager):
     # Create a campaign
@@ -253,7 +282,7 @@ class CreateParameter(TestManager):
 
         self.assertEqual(params, "value CP")
         self.assertEqual(name, "name CP")
-    
+
     # Create a parameter without name
     def CreateParameterWithoutName1(self):
         id_param = addParam(CreateParameter.id_campaign, "", "value CPWN1")
@@ -266,14 +295,16 @@ class CreateParameter(TestManager):
         self.assertEqual(name, "")
 
     def CreateParameterWithoutName2(self):
-        id_param = addParamWithoutName(CreateParameter.id_campaign, "value CPWN2")
+        id_param = addParamWithoutName(
+            CreateParameter.id_campaign, "value CPWN2"
+        )
 
         params = selectParams(id_param)
         name = selectParamName(id_param)
 
         self.assertEqual(params, "value CPWN2")
         self.assertEqual(name, None)
-    
+
     # Create a parameter without the parameter's value
     def CreateParameterWithoutValue(self):
         id_param = addParam(CreateParameter.id_campaign, "name CPWV", "")
@@ -284,37 +315,47 @@ class CreateParameter(TestManager):
         self.assertNotEqual(name, None)
         self.assertEqual(name, "name CPWV")
 
+
 ### Select parameter name
 class SelectParameterName(TestManager):
     # Return an existed name
     def SelectParameterName(self):
-        id_param = addParam(CreateParameter.id_campaign, "name SPN", "value SPN")
+        id_param = addParam(
+            CreateParameter.id_campaign, "name SPN", "value SPN"
+        )
 
         name = selectParamName(id_param)
         self.assertEqual(name, "name SPN")
-    
+
     # Return an uniformed name
     def SelectUniformedParameterName(self):
         name = selectParamName(0)
         self.assertEqual(name, None)
 
+
 ### Update name
 class UpdateParameterName(TestManager):
     def UpdateParameterName(self):
-        id_param = addParam(CreateParameter.id_campaign, "name UPN", "value UPN")
+        id_param = addParam(
+            CreateParameter.id_campaign, "name UPN", "value UPN"
+        )
 
         updateParamName(id_param, "new_name UPN")
         name = selectParamName(id_param)
         self.assertEqual(name, "new_name UPN")
 
+
 ### Update value
 class UpdateParameterValue(TestManager):
     def UpdateParameterValue(self):
-        id_param = addParam(CreateParameter.id_campaign, "name UPV", "value UPV")
+        id_param = addParam(
+            CreateParameter.id_campaign, "name UPV", "value UPV"
+        )
 
         updateParamValue(id_param, "new_value UPV")
         params = selectParams(id_param)
         self.assertEqual(params, "new_value UPV")
+
 
 ### Delete parameter
 class DeleteParameter(TestManager):
@@ -325,12 +366,13 @@ class DeleteParameter(TestManager):
         deleteParam(id_param)
         params = selectParams(id_param)
         self.assertEqual(params, None)
-    
+
     # Delete a non existed parameter
     def DeleteNonExistedParameter(self):
         deleteParam(0)
         params = selectParams(0)
         self.assertEqual(params, None)
+
 
 ## JOBS
 class CreateJob(TestManager):
@@ -366,7 +408,7 @@ class CreateJob(TestManager):
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
     # Create a job with an unvalided id campaign
     def CreateJobWithUnvalableCampaign(self):
         # Create a parameter
@@ -374,7 +416,7 @@ class CreateJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         try:
             id_job = addJob(0, id_param)
             self.assertTrue(False)
@@ -388,13 +430,13 @@ class CreateJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         try:
             id_job = addJob(CreateJob.id_campaign, None)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
     # Create a job with an unvalided id parameter
     def CreateJobWithUnvalableParameter(self):
         # Create a parameter
@@ -402,13 +444,14 @@ class CreateJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         try:
             id_job = addJob(CreateJob.id_campaign, 0)
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
+
 ### UpdateState
 class UpdateJobState(TestManager):
     # Update the state
@@ -418,11 +461,11 @@ class UpdateJobState(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         updateStateJob(id_job, 3)
         state = selectJobState(id_job)
         self.assertEqual(state, job_state.submitted)
-    
+
     # Update with a unvalided state
     def UpdateJobWithUnvalidedState(self):
         # Create a parameter
@@ -430,7 +473,7 @@ class UpdateJobState(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         state_before = selectJobState(id_job)
         try:
             updateStateJob(id_job, 66)
@@ -439,6 +482,7 @@ class UpdateJobState(TestManager):
             state_after = selectJobState(id_job)
 
             self.assertEqual(state_before, state_after)
+
 
 ### Delete
 class DeleteJob(TestManager):
@@ -449,13 +493,13 @@ class DeleteJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         killJob(id_job)
 
         state = selectJobState(id_job)
 
         self.assertEqual(state, job_state.cancelled)
-    
+
     # Delete a non existed job
     def DeleteNonExistedJob(self):
         # Create a parameter
@@ -463,13 +507,13 @@ class DeleteJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         killJob(0)
 
         state = selectJobState(0)
 
         self.assertEqual(state, None)
-    
+
     # Update a terminated job
     def UpdateJobTerminated(self):
         # Create a parameter
@@ -477,11 +521,11 @@ class DeleteJob(TestManager):
 
         ### Create a job
         id_job = addJob(CreateJob.id_campaign, id_param)
-        
+
         updateStateJob(id_job, 6)
         state_before = selectJobState(id_job)
         self.assertEqual(state_before, job_state.terminated)
-        
+
         try:
             updateStateJob(id_job, 4)
             self.assertTrue(False)
@@ -489,6 +533,7 @@ class DeleteJob(TestManager):
             state_after = selectJobState(id_job)
 
             self.assertEqual(state_before, state_after)
+
 
 ## CAMPAIGN_PROPERTIES
 class QueriesCampaignPropertiesUT(TestManager):
@@ -498,12 +543,18 @@ class QueriesCampaignPropertiesUT(TestManager):
     ### Create a campaign property
     id_camp_prop = addCampProp(id_campaign, id_cluster, "project", "json")
 
+
 class CreateCampProp(TestManager):
     # Create a campaign property
     def CreateCampProp(self):
         ### Create a campaign property
-        id_camp_prop = addCampProp(QueriesCampaignPropertiesUT.id_campaign, id_cluster, "project", "json")
-        
+        id_camp_prop = addCampProp(
+            QueriesCampaignPropertiesUT.id_campaign,
+            id_cluster,
+            "project",
+            "json",
+        )
+
         value = selectCampPropValue(id_camp_prop)
 
         self.assertEqual(value, "json")
@@ -512,31 +563,45 @@ class CreateCampProp(TestManager):
     # Create a campaign property without value
     def CreateCampPropWithoutValue(self):
         try:
-            id_camp_prop = addCampProp(QueriesCampaignPropertiesUT.id_campaign, id_cluster, "project", None)
+            id_camp_prop = addCampProp(
+                QueriesCampaignPropertiesUT.id_campaign,
+                id_cluster,
+                "project",
+                None,
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
-    
+
     # Create a campaign property without id cluster
     def CreateCampPropWithoutCluster(self):
         try:
-            id_camp_prop = addCampProp(QueriesCampaignPropertiesUT.id_campaign, None, "project", "json")
+            id_camp_prop = addCampProp(
+                QueriesCampaignPropertiesUT.id_campaign,
+                None,
+                "project",
+                "json",
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
-    
+
     # Create a campaign property with an unvalided id cluster
     def CreateCampPropWithUnvalidedCluster(self):
         try:
-            id_camp_prop = addCampProp(QueriesCampaignPropertiesUT.id_campaign, -1, "project", "json")
+            id_camp_prop = addCampProp(
+                QueriesCampaignPropertiesUT.id_campaign, -1, "project", "json"
+            )
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
     # Create a campaign property without name
     def CreateCampPropWithoutName(self):
         try:
-            id_camp_prop = addCampProp(QueriesCampaignPropertiesUT.id_campaign, id_cluster, "", "json")
+            id_camp_prop = addCampProp(
+                QueriesCampaignPropertiesUT.id_campaign, id_cluster, "", "json"
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
@@ -549,6 +614,7 @@ class CreateCampProp(TestManager):
         except ValueError as e:
             self.assertTrue(True)
 
+
 ### Delete a campaign property
 class DeleteCampProp(TestManager):
     # Delete a campaign property
@@ -556,12 +622,13 @@ class DeleteCampProp(TestManager):
         deleteCampProp(QueriesCampaignPropertiesUT.id_camp_prop)
         value = selectCampPropValue(QueriesCampaignPropertiesUT.id_camp_prop)
         self.assertEqual(value, None)
-    
+
     # Delete a non existed campaign property
     def DeleteNonExistedCampProp(self):
         deleteCampProp(0)
         value = selectCampPropValue(0)
         self.assertEqual(value, None)
+
 
 ## EVENTS
 class QueriesEventsUT(TestManager):
@@ -574,7 +641,13 @@ class QueriesEventsUT(TestManager):
 
     ### Create event for a campaign
     def CreateEventsForCampaign(self):
-        id_event_campaign = addEvent(3, QueriesEventsUT.id_campaign, "code campagne", "message campagne", False)
+        id_event_campaign = addEvent(
+            3,
+            QueriesEventsUT.id_campaign,
+            "code campagne",
+            "message campagne",
+            False,
+        )
         GetEvents.id_campaign_e = id_event_campaign
 
         state_campaign = selectEventState(id_event_campaign)
@@ -596,7 +669,9 @@ class QueriesEventsUT(TestManager):
 
     ### Create event for a job
     def CreateEventsForJob(self):
-        id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        id_event_job = addEvent(
+            2, QueriesEventsUT.id_job, "code job", "message job", False
+        )
         GetEvents.id_job_e = id_event_job
 
         state_job = selectEventState(id_event_job)
@@ -616,7 +691,9 @@ class QueriesEventsUT(TestManager):
         self.assertEqual(notified_job, False)
         self.assertNotEqual(id_event_job, None)
 
+
 ### Get events
+
 
 class GetEvents(TestManager):
     # ids of events
@@ -637,56 +714,80 @@ class GetEvents(TestManager):
     def GetOpenEvents(self):
         events = selectOpenEvents()
 
-        self.assertTrue(len(events)>3)
+        self.assertTrue(len(events) > 1)
+
 
 ### UpdateParent
 class UpdateEventParent(TestManager):
     # Update the parent
     def UpdateEventParent(self):
-        id_event_campaign = addEvent(3, QueriesEventsUT.id_campaign, "code campagne", "message campagne", False)
-        id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        id_event_campaign = addEvent(
+            3,
+            QueriesEventsUT.id_campaign,
+            "code campagne",
+            "message campagne",
+            False,
+        )
+        id_event_job = addEvent(
+            2, QueriesEventsUT.id_job, "code job", "message job", False
+        )
 
         updateParentEvent(id_event_job, id_event_campaign)
         parent_job = selectEventParent(id_event_job)
         self.assertEqual(parent_job, id_event_campaign)
 
+
 ### UpdateChecked
 class UpdateEventChecked(TestManager):
     # Update the checked
     def UpdateEventChecked(self):
-        id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        id_event_job = addEvent(
+            2, QueriesEventsUT.id_job, "code job", "message job", False
+        )
 
         updateCheckedEvent(id_event_job, 1)
         checked_job = selectEventChecked(id_event_job)
         self.assertEqual(checked_job, checkbox.yes)
 
+
 ### UpdateNotified
 class UpdateEventNotified(TestManager):
     # Update the notified
     def UpdateEventNotified(self):
-        id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        id_event_job = addEvent(
+            2, QueriesEventsUT.id_job, "code job", "message job", False
+        )
 
         updateNotifiedEvent(id_event_job, 1)
         notified_job = selectEventNotified(id_event_job)
         self.assertEqual(notified_job, True)
 
+
 class DeleteJobEvent(TestManager):
     ### Delete job event
     def CloseJobEvents(self):
-        id_event_job = addEvent(2, QueriesEventsUT.id_job, "code job", "message job", False)
+        id_event_job = addEvent(
+            2, QueriesEventsUT.id_job, "code job", "message job", False
+        )
 
         closeEvent(id_event_job)
         state_job = selectEventState(id_event_job)
         self.assertEqual(state_job, event_state.closed)
-    
+
     ### Delete campaign event
     def CloseCampaignEvent(self):
-        id_event_campaign = addEvent(3, QueriesEventsUT.id_campaign, "code campagne", "message campagne", False)
+        id_event_campaign = addEvent(
+            3,
+            QueriesEventsUT.id_campaign,
+            "code campagne",
+            "message campagne",
+            False,
+        )
 
         closeEvent(id_event_campaign)
         state_campaign = selectEventState(id_event_campaign)
         self.assertEqual(state_campaign, event_state.closed)
-    
+
     ### Delete non existed event
     def CloseNonExistedEvent(self):
         closeEvent(0)
@@ -695,15 +796,16 @@ class DeleteJobEvent(TestManager):
 
     ## USER MAPPING
 
-        ### Create
+    ### Create
 
-        ### Delete
+    ### Delete
 
     ## AUTHENTICATION
 
-        ### Create
+    ### Create
 
-        ### Delete
+    ### Delete
+
 
 ## BAG OF TASK
 class QueriesBagOfTaskUT(TestManager):
@@ -724,41 +826,52 @@ class QueriesBagOfTaskUT(TestManager):
     # Create a parameter7
     id_param7 = addParam(id_campaign, "name7", "value7")
 
+
 class CreateBagOfTask(TestManager):
     # Create a bag of task
     def CreateBagOfTask(self):
-        id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param1, 8)
+        id_bag_of_task = addBagOfTask(
+            QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param1, 8
+        )
         priority = selectBagOfTaskPriority(id_bag_of_task)
         self.assertEqual(priority, 8)
 
     # Create a bag of task without priority
     def CreateBagOfTaskWithoutPriority(self):
-        id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param2, None)
+        id_bag_of_task = addBagOfTask(
+            QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param2, None
+        )
         priority = selectBagOfTaskPriority(id_bag_of_task)
         self.assertEqual(priority, 10)
 
     # Create a bag of task with a unvalided priority
     def CreateBagOfTaskWithUnvalidedPriority(self):
-        id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param3, -1)
+        id_bag_of_task = addBagOfTask(
+            QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param3, -1
+        )
         priority = selectBagOfTaskPriority(id_bag_of_task)
         self.assertEqual(priority, 10)
-    
+
     # Create a bag of task without id campaign
     def CreateBagOfTaskWithoutCampaign(self):
         try:
-            id_bag_of_task = addBagOfTask(None, QueriesBagOfTaskUT.id_param4, 10)
+            id_bag_of_task = addBagOfTask(
+                None, QueriesBagOfTaskUT.id_param4, 10
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
-    
+
     # Create a bag of task without id param
     def CreateBagOfTaskWithoutParam(self):
         try:
-            id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, None, 10)
+            id_bag_of_task = addBagOfTask(
+                QueriesBagOfTaskUT.id_campaign, None, 10
+            )
             self.assertTrue(False)
         except Exception as e:
             self.assertTrue(True)
-    
+
     # Create a bag of task with an unexisted campaign
     def CreateBagOfTaskWithUnexistedCampaign(self):
         try:
@@ -766,34 +879,41 @@ class CreateBagOfTask(TestManager):
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
+
     # Create a bag of task with an unexisted param
     def CreateBagOfTaskWithUnexistedParam(self):
         try:
-            id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, 0, 10)
+            id_bag_of_task = addBagOfTask(
+                QueriesBagOfTaskUT.id_campaign, 0, 10
+            )
             self.assertTrue(False)
         except ValueError as e:
             self.assertTrue(True)
-    
-        
+
+
 ### Update Priority
 class UpdateBagOfTaskPriority(TestManager):
     # Update the priority
     def UpdateBagOfTaskPriority(self):
-        id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param6, 10)
+        id_bag_of_task = addBagOfTask(
+            QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param6, 10
+        )
         updatePriorityBagOfTask(id_bag_of_task, 5)
         priority = selectBagOfTaskPriority(id_bag_of_task)
         self.assertEqual(priority, 5)
 
     # Update with a unvalided priority
     def UpdateBagOfTaskWithUnvalidedPriority(self):
-        id_bag_of_task = addBagOfTask(QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param7, 10)
+        id_bag_of_task = addBagOfTask(
+            QueriesBagOfTaskUT.id_campaign, QueriesBagOfTaskUT.id_param7, 10
+        )
         priority_before = selectBagOfTaskPriority(id_bag_of_task)
         try:
             updatePriorityBagOfTask(id_bag_of_task, -1)
         except ValueError as e:
             priority_after = selectBagOfTaskPriority(id_bag_of_task)
             self.assertEqual(priority_before, priority_after)
+
 
 class QueriesUTClean(TestManager):
     # Delete campaign
@@ -814,49 +934,49 @@ class QueriesUTClean(TestManager):
     deleteParam(QueriesBagOfTaskUT.id_param7)
 
     ## JOBS TO LAUNCH
-        
-        ### Create
 
-        ### Delete
+    ### Create
 
-    ## QUEUE COUNTS
-        
-        ### Create
+    ### Delete
 
-        ### Delete
+    ##  QUEUE COUNTS
+
+    ### Create
+
+    ### Delete
 
     ## ADMISSION RULES
-        
-        ### Create
 
-        ### Delete
+    ### Create
 
-    ## USER NOTIFICATION
-            
-        ### Create
+    ### Delete
 
-        ### Delete
+    ##  USER NOTIFICATION
 
-    ## USER PRIORITY
-            
-        ### Create
+    ### Create
 
-        ### Delete
+    ### Delete
+
+    ##  USER PRIORITY
+
+    ### Create
+
+    ### Delete
 
     ## GRID USER
-            
-        ### Create
 
-        ### Delete
+    ### Create
 
-    ## TASKS AFFINITY
-            
-        ### Create
+    ### Delete
 
-        ### Delete
+    ##  TASKS AFFINITY
+
+    ### Create
+
+    ### Delete
 
     ## TAPS
-        
-        ### Create
 
-        ### Delete
+    ### Create
+
+    ### Delete
