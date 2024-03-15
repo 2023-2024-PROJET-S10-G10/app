@@ -4,6 +4,7 @@ import sys
 # Appends the parent directory of the current directory to the Python module search path.
 sys.path.append(sys.path[0].replace("/Test", ""))
 
+sys.argv[1] = "SQL"
 from Parser.jdl_parser import *
 from JdlFiles.jdl_string import *
 

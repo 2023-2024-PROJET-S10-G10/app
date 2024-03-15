@@ -1,8 +1,10 @@
-# To use in app folder
-path_DB = "sqlite+pysqlite:///SQL/mycigri.db"
+sqlite_prefix = "sqlite+pysqlite:///"
+name_DB = "mycigri.db"
 
-# To use in Test folder
-path_DB_test = "sqlite+pysqlite:///../Test/SQL/mycigri_test.db"
+path_DB = sqlite_prefix + "SQL/" + name_DB
+
+def getPath(path):
+    return sqlite_prefix + path + name_DB
 
 
 def validation(value, default):

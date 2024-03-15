@@ -25,8 +25,7 @@ jobs:
 
       - name: Create database
         run: |
-          cd Test
-          poetry run python3 ../SQL/Config_BDD.py    
+          poetry run python3 SQL/Config_BDD.py Test/SQL
 
 
       - name: Exécuter les tests

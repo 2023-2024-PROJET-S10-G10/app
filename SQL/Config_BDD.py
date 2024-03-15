@@ -8,21 +8,55 @@ sys.path.append(sys.path[0].replace("/SQL", ""))
 
 from utils.sql import *
 
-path_exec = os.getcwd()
-
-if path_exec.endswith("/app/Test"):
-    path = path_DB_test
-elif path_exec.endswith("/app"):
-    path = path_DB
-else:
-    print("You are not in the right directory")
-    print("If you want to use the test database, go to app/Test")
-    print("If you want to use the production database, go to app")
-    sys.exit(1)
-
-engine = create_engine(path, echo=True)
-
 metadata_obj = MetaData()
+
+if len(sys.argv) != 2:
+    print("Usage:   python Config_BDD.py <path_DB> (default: SQL in /app)")
+    print("Example: python Config_BDD.py SQL")
+    path = "SQL/"
+else:
+    path = sys.argv[1]
+    if path == "SQL" or path == "SQL/":
+        path = "SQL/"
+    else:
+        path_local = "../" + path
+        if os.path.isdir(path_local):
+            print(f"The path `{path_local}` is not valid.")
+            sys.exit(1)
+        path = sys.argv[1]
+        if not path.endswith("/"):
+            path += "/"
+
+print(path)
+engine = create_engine(getPath(path), echo=True)
+
+
+def initializeCluster():
+    metadata_obj.create_all(engine)
+
+    # TODO: Replace dummy values
+    clusterLuke = insert(cluster_table).values(
+        name="luke",
+        api_url="/foo",
+        api_username="dova",
+        api_password="zer",
+        batch=api(1),
+        api_auth_type=auth_type(1),
+    )
+    clusterDahu = insert(cluster_table).values(
+        name="dahu",
+        api_url="/bar",
+        api_username="air",
+        api_password="zerzer",
+        batch=api(2),
+        api_auth_type=auth_type(1),
+    )
+
+    with engine.connect() as conn:
+        conn.execute(clusterLuke)
+        conn.commit()
+        conn.execute(clusterDahu)
+        conn.commit()
 
 
 class api(enum.Enum):
@@ -326,30 +360,4 @@ taps = Table(
     ),
 )
 
-
-if __name__ == "__main__":
-    metadata_obj.create_all(engine)
-
-    # TODO: Replace dummy values
-    clusterLuke = insert(cluster_table).values(
-        name="luke",
-        api_url="/foo",
-        api_username="dova",
-        api_password="zer",
-        batch=api(1),
-        api_auth_type=auth_type(1),
-    )
-    clusterDahu = insert(cluster_table).values(
-        name="dahu",
-        api_url="/bar",
-        api_username="air",
-        api_password="zerzer",
-        batch=api(2),
-        api_auth_type=auth_type(1),
-    )
-
-    with engine.connect() as conn:
-        conn.execute(clusterLuke)
-        conn.commit()
-        conn.execute(clusterDahu)
-        conn.commit()
+initializeCluster()
